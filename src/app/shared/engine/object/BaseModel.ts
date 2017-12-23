@@ -2,7 +2,6 @@ import { IBaseModel } from './BaseModel.interface';
 import { IGameRenderer } from '../';
 
 export class BaseModel implements IBaseModel {
-  private _model = null;
   protected _gameRenderer = null;
   constructor(gameRenderer: IGameRenderer) {
     this._gameRenderer = gameRenderer;
@@ -18,6 +17,16 @@ export class BaseModel implements IBaseModel {
 
   }
   rotateRight(angle) {
+
+  }
+  buildFromUrl(modelName: string, path: string, modelFileName: string, callback?: Function) {
+
+  }
+  buildFromGallery(modelName, callback?: Function) {
+
+  }
+
+  getModel() {
 
   }
 }

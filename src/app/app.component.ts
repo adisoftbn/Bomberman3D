@@ -1,7 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { IGameRenderer, GameRenderer } from './shared/engine';
 
-import { IBaseModel, Character } from './shared/engine/models';
+import { IBaseModel, Character } from './shared/engine/object';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,7 @@ import { IBaseModel, Character } from './shared/engine/models';
 })
 export class AppComponent implements AfterViewInit {
   private _game: IGameRenderer
-  private _currentCharacter: IBaseModel;
+  private _currentCharacter: Character;
   ngAfterViewInit() {
     this._game = new GameRenderer('renderCanvas');
     this._game.createScene();
@@ -20,6 +20,9 @@ export class AppComponent implements AfterViewInit {
   }
 
   createTestGame() {
-    this._currentCharacter = new Character(this._game, 'currentCharacter', '/assets/Rabbit/', 'Rabbit.babylon');
+    this._currentCharacter = new Character(this._game);
+    this._currentCharacter.buildFromGallery('dude', () => {
+      this._game.getCamera().lockedTarget = this._currentCharacter.getModelHead();
+    });
   }
 }
