@@ -1,4 +1,4 @@
-import { IBaseModel } from './BaseModel.interface';
+import { IBaseModel } from './baseModel.interface';
 import { IGameRenderer } from '../';
 
 export class BaseModel implements IBaseModel {

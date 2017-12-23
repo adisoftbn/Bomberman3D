@@ -1,2 +1,2 @@
-export * from './GameRenderer.interface';
-export * from './GameRenderer';
+export * from './gameRenderer.interface';
+export * from './gameRenderer';

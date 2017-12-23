@@ -1,3 +1,3 @@
-export * from './BaseModel.interface';
-export * from './BaseModel';
-export * from './Character';
+export * from './baseModel.interface';
+export * from './baseModel';
+export * from './character';

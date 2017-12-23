@@ -1,4 +1,4 @@
-import { ICharacterGalleryItem } from './CharacterGalleryItem.interface';
+import { ICharacterGalleryItem } from './characterGalleryItem.interface';
 
 export class CharacterGalleryItem implements ICharacterGalleryItem {
   modelPath = '';

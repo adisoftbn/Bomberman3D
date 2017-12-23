@@ -1,1 +1,2 @@
-export * from './CharacterGalleryManager';
+export * from './characterGalleryManager';
+export * from './textureGalleryManager';
