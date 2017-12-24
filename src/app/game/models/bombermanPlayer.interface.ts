@@ -17,4 +17,5 @@ export interface IBombermanPlayer {
   playerType: EPlayerCharacterType;
   characterName: string;
   initialPosition: ICharacterPosition;
+  characterModel: string;
 }

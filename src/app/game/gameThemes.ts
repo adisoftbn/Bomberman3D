@@ -9,14 +9,14 @@ export class GameThemes {
       title: 'Green land',
       description: 'Unknown description',
       groundTextures: [
-        'grass'
+        'ground-grass'
       ],
       wallTextures: {
         indestructibleWalls: [
-          'bricks', 'bricks2'
+          'wall-bricks', 'wall-bricks2'
         ],
         destructibleWalls: [
-          'aged-building-facade'
+          'wall-aged-building-facade'
         ]
       },
       avilableCharacters: [
@@ -34,5 +34,18 @@ export class GameThemes {
 
   initGameThemes() {
 
+  }
+  getThemeByName(themeName) {
+    let foundTheme = null;
+    this.themes.some(theme => {
+      if (theme.name === themeName) {
+        foundTheme = theme;
+        return true;
+      }
+    });
+    if (!foundTheme) {
+      throw new Error(`Theme ${themeName} cannot be found!`);
+    }
+    return foundTheme;
   }
 }
