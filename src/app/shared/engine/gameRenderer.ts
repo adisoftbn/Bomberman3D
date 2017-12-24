@@ -1,5 +1,5 @@
 import {
-  Engine, Scene, FreeCamera, Light, DirectionalLight, IShadowLight,
+  Engine, Scene, FreeCamera, Light, DirectionalLight, IShadowLight, PointLight,
   Vector3, HemisphericLight, MeshBuilder, ShadowGenerator, ArcRotateCamera, StandardMaterial, Color3, FollowCamera
 } from 'babylonjs';
 
@@ -14,7 +14,7 @@ export class GameRenderer implements IGameRenderer {
   private _engine: Engine;
   private _scene: Scene;
   private _camera: FreeCamera;
-  private _light: IShadowLight;
+  private _light: PointLight;
   private _shadowGenerator: ShadowGenerator;
   private _characterGallery: CharacterGalleryManager;
   private _textureGallery: TextureGalleryManager;
@@ -25,8 +25,12 @@ export class GameRenderer implements IGameRenderer {
   private _groundMaterial = null;
 
   public texturesQuality = 'hq'; // hq/mq/lq
+  public diffuseColor: Color3 = new Color3(0.5, 0.5, 0.5);
+  public specularColor: Color3 = new Color3(0.1, 0.1, 0.1);
+  public ambientColor: Color3 = new Color3(0.3, 0.3, 0.3);
 
   protected _physicsEnabled = true;
+
   constructor(canvasElement: string) {
     this._canvas = <HTMLCanvasElement>document.getElementById(canvasElement);
     this._engine = new Engine(this._canvas, true);
@@ -35,10 +39,15 @@ export class GameRenderer implements IGameRenderer {
     this._textureGallery = new TextureGalleryManager(this);
   }
 
+  public isPhysicsEnabled() {
+    return this._physicsEnabled;
+  }
+
   public createScene() {
     this._scene = new Scene(this._engine);
-    this._light = new DirectionalLight('light1', new Vector3(0, -50.5, -1.0), this._scene);
-    this._camera = new FreeCamera('camera1', new Vector3(0, 0, -150), this._scene);
+    this._light = new PointLight('light1', new Vector3(0, 50, -50), this._scene);
+    this._light.intensity = 2;
+    this._camera = new FreeCamera('camera1', new Vector3(0, 0, -10), this._scene);
     if (this._physicsEnabled) {
       this._scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
       this._camera.checkCollisions = true;
@@ -46,11 +55,11 @@ export class GameRenderer implements IGameRenderer {
     }
 
 
-    this._scene.ambientColor = new Color3(0.3, 0.3, 0.3);
+    this._scene.ambientColor = this.ambientColor;
 
-    this._light.position = new Vector3(20, 150, 70);
+    // this._light.position = new Vector3(20, 150, 70);
 
-    this._camera.attachControl(this._canvas, true);
+    // this._camera.attachControl(this._canvas, true);
     // this._camera.setPosition(new BABYLON.Vector3(0, 40, 12));
     this._camera.minZ = 10.0;
 
@@ -59,8 +68,8 @@ export class GameRenderer implements IGameRenderer {
       width: this._groundSizeWidth, height: this._groundSizeHeight, subdivisions: 2
     }, this._scene);
     this._groundMaterial = new StandardMaterial('ground', this._scene);
-    this._groundMaterial.diffuseColor = new Color3(0.5, 0.5, 0.5);
-    this._groundMaterial.specularColor = new Color3(0, 0, 0);
+    this._groundMaterial.diffuseColor = this.diffuseColor;
+    this._groundMaterial.specularColor = this.specularColor;
     this._groundMaterial.backFaceCulling = false;
     this._ground.material = this._groundMaterial;
     this._ground.receiveShadows = true;
@@ -86,10 +95,16 @@ export class GameRenderer implements IGameRenderer {
   public getCharacterGallery() {
     return this._characterGallery;
   }
+
+  public getTextureGallery() {
+    return this._textureGallery;
+  }
+
   public setGroundSize(width, height) {
     this._groundSizeWidth = width;
     this._groundSizeHeight = height;
   }
+
   public setGroundTexture(textureUrl: string) {
     this._ground.material.diffuseTexture = new BABYLON.Texture(textureUrl, this._scene);
   }

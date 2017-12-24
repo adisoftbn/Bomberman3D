@@ -10,12 +10,14 @@ export class Character extends BaseModel {
   protected _userControlKeyMapping: IUserControlKeyMapping = null;
   protected _networkingChannel: INetworkChannel = null;
   protected _characterSpeed = 0;
-  protected _characterInitialForwardSpeed = 0.1;
-  protected _characterMaxForwardSpeed = 0.4;
-  protected _characterBackwardSpeed = 0.2;
+  protected _characterInitialForwardSpeed = 0.02;
+  protected _characterMaxForwardSpeed = 0.1;
+  protected _characterBackwardSpeed = 0.04;
+  protected _characterRotateSpeed = 0.02;
 
   protected _modelLoaded = false;
   protected _model = null;
+  protected _modelRoot = null;
   protected _modelhead = null;
   protected _animations = {};
   protected _skeletons = [];
@@ -32,7 +34,10 @@ export class Character extends BaseModel {
     super(gameRenderer);
     this._gameRenderer = gameRenderer;
     this._initialPosition = initialPosition;
-    this._modelhead = MeshBuilder.CreateSphere('', { segments: 4, diameter: 1.01 }, this._gameRenderer.getScene());
+    this._modelRoot = MeshBuilder.CreateBox('', { size: 0.001 }, this._gameRenderer.getScene());
+    this._modelRoot.scaling = new Vector3(0.1, 0.1, 0.1);
+    this._modelhead = MeshBuilder.CreateSphere('', { segments: 4, diameter: 0.01 }, this._gameRenderer.getScene());
+    this._modelhead.parent = this._modelRoot;
 
     this._modelhead.position.y = this.headHeight;
     if (userControlKeyMapping) {
@@ -48,6 +53,10 @@ export class Character extends BaseModel {
 
   getModel() {
     return this._model;
+  }
+
+  getModelRoot() {
+    return this._modelRoot;
   }
 
   getModelHead() {
@@ -100,10 +109,10 @@ export class Character extends BaseModel {
         const scene = this._gameRenderer.getScene();
         this._skeletons = skeletons;
         this._model = newMeshes[0];
-        this._modelhead.parent = this._model;
+        this._model.parent = this._modelRoot;
         this._model.position = this._initialPosition;
         this._model.scaling = new Vector3(0.1, 0.1, 0.1);
-        this._model.rotation.y = Math.PI;
+        // this._model.rotation.y = Math.PI;
         this._gameRenderer.getShadowGenerator().getShadowMap().renderList.push(this._model);
         // scene.beginAnimation(skeletons[0], 0, 500, true, 0.8);
         if (!this._modelLoaded) {
@@ -156,33 +165,33 @@ export class Character extends BaseModel {
             this._gameRenderer.getScene().registerBeforeRender(() => {
               if (this.keys.forward === 1) {
                 this.increaseCharacterSpeedForward();
-                const posX = Math.sin(this._model.rotation.y) * this._characterSpeed;
-                const posZ = Math.cos(this._model.rotation.y) * this._characterSpeed;
+                const posX = Math.sin(this._modelRoot.rotation.y) * this._characterSpeed;
+                const posZ = Math.cos(this._modelRoot.rotation.y) * this._characterSpeed;
                 // console.log(posX, posZ);
-                const cameraX = this._model.position.x - posX * 10;
-                const cameraY = this._model.position.y - posZ * 10;
-                this._model.position.x += posX;
-                this._model.position.z += posZ;
-                // this._gameRenderer.setCameraTarget(this._model, true, cameraX, cameraY);
+                // const cameraX = this._modelRoot.position.x - posX * 10;
+                // const cameraY = this._modelRoot.position.y - posZ * 10;
+                this._modelRoot.position.x += posX;
+                this._modelRoot.position.z += posZ;
+                // this._gameRenderer.setCameraTarget(this._modelRoot, true, cameraX, cameraY);
               } else if (this.keys.backward === 1) {
                 this.fixCharacterSpeedBackward();
-                const posX = Math.sin(this._model.rotation.y) * this._characterSpeed;
-                const posZ = Math.cos(this._model.rotation.y) * this._characterSpeed;
+                const posX = Math.sin(this._modelRoot.rotation.y) * this._characterSpeed;
+                const posZ = Math.cos(this._modelRoot.rotation.y) * this._characterSpeed;
                 // console.log(posX, posZ);
-                const cameraX = this._model.position.x - posX * 10;
-                const cameraY = this._model.position.y - posZ * 10;
-                this._model.position.x -= posX;
-                this._model.position.z -= posZ;
-                /// this._gameRenderer.setCameraTarget(this._model, true, cameraX, cameraY);
+                // const cameraX = this._modelRoot.position.x - posX * 10;
+                // const cameraY = this._modelRoot.position.y - posZ * 10;
+                this._modelRoot.position.x -= posX;
+                this._modelRoot.position.z -= posZ;
+                /// this._gameRenderer.setCameraTarget(this._modelRoot, true, cameraX, cameraY);
               }
               if (this.keys.forward === 0 && this.keys.backward === 0 && this._characterSpeed > 0) {
                 this._characterSpeed = 0;
               }
               if (this.keys.right === 1) {
-                this._model.rotation.y = this._model.rotation.y + 0.1;
+                this._modelRoot.rotation.y = this._modelRoot.rotation.y + this._characterRotateSpeed;
               }
               if (this.keys.left === 1) {
-                this._model.rotation.y = this._model.rotation.y - 0.1
+                this._modelRoot.rotation.y = this._modelRoot.rotation.y - this._characterRotateSpeed
               }
             });
           }
@@ -193,6 +202,7 @@ export class Character extends BaseModel {
       console.log(e);
     }
   }
+
   increaseCharacterSpeedForward() {
     if (this._characterSpeed === 0) {
       this._characterSpeed = this._characterInitialForwardSpeed;
@@ -204,12 +214,11 @@ export class Character extends BaseModel {
         }
       }
   }
+
   fixCharacterSpeedBackward() {
     if (this._characterSpeed !== this._characterBackwardSpeed) {
       this._characterSpeed = this._characterBackwardSpeed;
     }
   }
 
-  public moveForward() {
-  }
 }
