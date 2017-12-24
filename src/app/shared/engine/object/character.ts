@@ -13,7 +13,7 @@ export class Character extends BaseModel {
   protected _characterInitialForwardSpeed = 0.02;
   protected _characterMaxForwardSpeed = 0.1;
   protected _characterBackwardSpeed = 0.04;
-  protected _characterRotateSpeed = 0.02;
+  protected _characterRotateSpeed = 0.03;
 
   protected _modelLoaded = false;
   protected _model = null;
@@ -38,6 +38,8 @@ export class Character extends BaseModel {
     this._modelRoot.scaling = new Vector3(0.1, 0.1, 0.1);
     this._modelhead = MeshBuilder.CreateSphere('', { segments: 4, diameter: 0.01 }, this._gameRenderer.getScene());
     this._modelhead.parent = this._modelRoot;
+    this._modelhead.receiveShadows = true;
+    this._gameRenderer.getShadowGenerator().getShadowMap().renderList.push(this._modelRoot);
 
     this._modelhead.position.y = this.headHeight;
     if (userControlKeyMapping) {
@@ -109,11 +111,15 @@ export class Character extends BaseModel {
         const scene = this._gameRenderer.getScene();
         this._skeletons = skeletons;
         this._model = newMeshes[0];
+        this._model.position.x = 1000;
         this._model.parent = this._modelRoot;
         this._model.position = this._initialPosition;
         this._model.scaling = new Vector3(0.1, 0.1, 0.1);
-        // this._model.rotation.y = Math.PI;
+        // this._model.receiveShadows = true;
         this._gameRenderer.getShadowGenerator().getShadowMap().renderList.push(this._model);
+        this._gameRenderer.getShadowGenerator().addShadowCaster(this._model);
+        this.switchToAnimation('stand');
+        // this._model.rotation.y = Math.PI;
         // scene.beginAnimation(skeletons[0], 0, 500, true, 0.8);
         if (!this._modelLoaded) {
           this._modelLoaded = true;

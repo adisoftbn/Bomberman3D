@@ -1,4 +1,4 @@
-import { Vector3, StandardMaterial, MeshBuilder, Mesh, Vector4 } from 'babylonjs';
+import { Vector3, StandardMaterial, MeshBuilder, Mesh, Vector4, Texture } from 'babylonjs';
 
 import { GameRenderer } from '../';
 import { BaseModel } from './baseModel';
@@ -27,9 +27,11 @@ export class Cube extends BaseModel {
     this._modelMaterial = new StandardMaterial('model', this._gameRenderer.getScene());
     this._modelMaterial.diffuseColor = this._gameRenderer.diffuseColor;
     this._modelMaterial.specularColor = this._gameRenderer.specularColor;
-    this._modelMaterial.backFaceCulling = false;
+    this._modelMaterial.ambientColor = this._gameRenderer.ambientColor;
+    // this._modelMaterial.backFaceCulling = false;
     this._model.material = this._modelMaterial;
-    this._model.receiveShadows = true;
+    // this._gameRenderer.getShadowGenerator().getShadowMap().renderList.push(this._model);
+    this._gameRenderer.getShadowGenerator().addShadowCaster(this._model);
     if (this._gameRenderer.isPhysicsEnabled()) {
       this._model.checkCollisions = true;
     }
@@ -41,23 +43,17 @@ export class Cube extends BaseModel {
   }
 
   public setTexture(textureUrl: string) {
-    this._modelMaterial.diffuseTexture = new BABYLON.Texture(textureUrl, this._gameRenderer.getScene());
+    this._modelMaterial.diffuseTexture = new Texture(textureUrl, this._gameRenderer.getScene());
   }
 
   public setTextureFromGallery(textureName) {
-    const textureUrl = this._gameRenderer.getTextureGallery().getTextureUrlByName(textureName);
-    if (textureUrl) {
-      this._modelMaterial.diffuseTexture = new BABYLON.Texture(textureUrl, this._gameRenderer.getScene());
-      const interval = setInterval(() => {
-        if (this._modelMaterial.diffuseTexture.isReady()) {
-          clearInterval(interval);
-          const sizes = this._modelMaterial.diffuseTexture.getSize();
-          const ratio = sizes['width'] / sizes['height'];
-          this._modelMaterial.diffuseTexture.uScale = (this._initialHeight / 10) * ratio;
-          this._modelMaterial.diffuseTexture.vScale = (this._initialWidth / 10) / ratio;
-        }
-      }, 1);
-    }
+    this._gameRenderer.getTextureGallery().getTextureObjectByName(textureName).then(texture => {
+      this._modelMaterial.diffuseTexture = texture;
+      const sizes = this._modelMaterial.diffuseTexture.getSize();
+      const ratio = sizes['width'] / sizes['height'];
+      this._modelMaterial.diffuseTexture.uScale = this._initialHeight * ratio;
+      this._modelMaterial.diffuseTexture.vScale = this._initialWidth / ratio;
+    });
   }
 
 

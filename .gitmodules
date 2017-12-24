@@ -1,0 +1,3 @@
+[submodule "src/app/shared/engine/WebGLTypescriptWrapper"]
+	path = src/app/shared/engine/WebGLTypescriptWrapper
+	url = https://github.com/adisoftbn/WebGLTypescriptWrapper.git

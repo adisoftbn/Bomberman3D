@@ -21,29 +21,32 @@ export class AppComponent implements AfterViewInit {
     this._gameRenderer.setGroundSize(groundWidth, groundHeight);
     this._gameRenderer.createScene();
     this._gameRenderer.animate();
+    
     let cube = new Cube(this._gameRenderer, new Vector3(0, 0.5, -groundHeight / 2), groundWidth + 1, 1, 1);
-    cube.setTextureFromGallery('grass');
+    cube.setTextureFromGallery('wall-bricks');
     this._borderWall.push(cube);
-
     cube = new Cube(this._gameRenderer, new Vector3(0, 0.5, groundHeight / 2), groundWidth + 1, 1, 1);
-    cube.setTextureFromGallery('grass');
+    cube.setTextureFromGallery('wall-bricks');
     this._borderWall.push(cube);
-
     cube = new Cube(this._gameRenderer, new Vector3(groundWidth / 2, 0.5, 0), 1, 1, groundHeight - 1);
-    cube.setTextureFromGallery('grass');
+    cube.setTextureFromGallery('wall-bricks');
     this._borderWall.push(cube);
-
-
     cube = new Cube(this._gameRenderer, new Vector3(-groundWidth / 2, 0.5, 0), 1, 1, groundHeight - 1);
-    cube.setTextureFromGallery('grass');
+    cube.setTextureFromGallery('wall-bricks');
     this._borderWall.push(cube);
+
+    cube = new Cube(this._gameRenderer, new Vector3(0, 0.5, 0), 1, 1, 1);
+    cube.setTextureFromGallery('wall-bricks2');
+
+    cube = new Cube(this._gameRenderer, new Vector3(0, 0.5, 1.2), 1, 1, 1);
+    cube.setTextureFromGallery('wall-bricks2');
 
     this.createTestGame();
   }
 
   createTestGame() {
 
-    this._gameRenderer.setGroundTextureFromGallery('pavement');
+    this._gameRenderer.setGroundTextureFromGallery('ground-pavement');
     this._currentCharacter = new Character(this._gameRenderer, new Vector3(0, 0, 0), {
       forwardKey: 38,
       backwardKey: 40,
@@ -53,8 +56,8 @@ export class AppComponent implements AfterViewInit {
     this._currentCharacter.buildFromGallery('rabbit', () => {
       const camera = this._gameRenderer.getCamera();
       camera.parent = this._currentCharacter.getModelRoot();
-      camera.position.z = -50;
-      camera.rotation.x = Math.PI / 8;
+      camera.position.z = -30;
+      camera.rotation.x = Math.PI / 6;
       // camera.lockedTarget = this._currentCharacter.getModel();
       //      camera.setPosition(new BABYLON.Vector3(11.5, 3.5, 0));
       camera.position.y = 30;

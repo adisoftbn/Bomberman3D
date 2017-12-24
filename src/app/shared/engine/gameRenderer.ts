@@ -1,5 +1,5 @@
 import {
-  Engine, Scene, FreeCamera, Light, DirectionalLight, IShadowLight, PointLight,
+  Engine, Scene, FreeCamera, Light, DirectionalLight, IShadowLight, PointLight, Texture,
   Vector3, HemisphericLight, MeshBuilder, ShadowGenerator, ArcRotateCamera, StandardMaterial, Color3, FollowCamera
 } from 'babylonjs';
 
@@ -25,9 +25,9 @@ export class GameRenderer implements IGameRenderer {
   private _groundMaterial = null;
 
   public texturesQuality = 'hq'; // hq/mq/lq
-  public diffuseColor: Color3 = new Color3(0.5, 0.5, 0.5);
-  public specularColor: Color3 = new Color3(0.1, 0.1, 0.1);
-  public ambientColor: Color3 = new Color3(0.3, 0.3, 0.3);
+  public diffuseColor: Color3 = new Color3(0.8, 0.8, 0.8);
+  public specularColor: Color3 = new Color3(0.3, 0.3, 0.3);
+  public ambientColor: Color3 = new Color3(0.5, 0.5, 0.5);
 
   protected _physicsEnabled = true;
 
@@ -45,9 +45,10 @@ export class GameRenderer implements IGameRenderer {
 
   public createScene() {
     this._scene = new Scene(this._engine);
-    this._light = new PointLight('light1', new Vector3(0, 50, -50), this._scene);
+    this._light = new PointLight('light1', new Vector3(0, 30, -30), this._scene);
     this._light.intensity = 2;
     this._camera = new FreeCamera('camera1', new Vector3(0, 0, -10), this._scene);
+    this._scene.shadowsEnabled = true;
     if (this._physicsEnabled) {
       this._scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
       this._camera.checkCollisions = true;
@@ -70,13 +71,15 @@ export class GameRenderer implements IGameRenderer {
     this._groundMaterial = new StandardMaterial('ground', this._scene);
     this._groundMaterial.diffuseColor = this.diffuseColor;
     this._groundMaterial.specularColor = this.specularColor;
-    this._groundMaterial.backFaceCulling = false;
+    // this._groundMaterial.backFaceCulling = false;
     this._ground.material = this._groundMaterial;
     this._ground.receiveShadows = true;
     if (this._physicsEnabled) {
       this._ground.checkCollisions = true;
     }
     this._shadowGenerator = new ShadowGenerator(2048, this._light);
+    this._shadowGenerator.setDarkness(0.5);
+    this._shadowGenerator.usePoissonSampling = true;
 
   }
 
@@ -106,23 +109,17 @@ export class GameRenderer implements IGameRenderer {
   }
 
   public setGroundTexture(textureUrl: string) {
-    this._ground.material.diffuseTexture = new BABYLON.Texture(textureUrl, this._scene);
+    this._ground.material.diffuseTexture = new Texture(textureUrl, this._scene);
   }
 
   public setGroundTextureFromGallery(textureName) {
-    const textureUrl = this._textureGallery.getTextureUrlByName(textureName);
-    if (textureUrl) {
-      this._ground.material.diffuseTexture = new BABYLON.Texture(textureUrl, this._scene);
-      const interval = setInterval(() => {
-        if (this._ground.material.diffuseTexture.isReady()) {
-          clearInterval(interval);
-          const sizes = this._ground.material.diffuseTexture.getSize();
-          const ratio = sizes['width'] / sizes['height'];
-          this._ground.material.diffuseTexture.uScale = (this._groundSizeWidth / 10) * ratio;
-          this._ground.material.diffuseTexture.vScale = (this._groundSizeHeight / 10) / ratio;
-        }
-      }, 1);
-    }
+    this._textureGallery.getTextureObjectByName(textureName).then(texture => {
+      this._ground.material.diffuseTexture = texture;
+      const sizes = this._ground.material.diffuseTexture.getSize();
+      const ratio = sizes['width'] / sizes['height'];
+      this._ground.material.diffuseTexture.uScale = this._groundSizeWidth * ratio;
+      this._ground.material.diffuseTexture.vScale = this._groundSizeHeight / ratio;
+    });
   }
 
   public setCameraTarget(model, updateCameraPosition: boolean = false, cameraX: number = 0, cameraZ: number = 0) {
