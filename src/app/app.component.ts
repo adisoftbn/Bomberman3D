@@ -5,13 +5,16 @@ import { IGameRenderer, GameRenderer } from './shared/engine';
 
 import { IBaseModel, Character, Cube } from './shared/engine/object';
 
+import { GameBuilder } from './game';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements AfterViewInit {
-  private _gameRenderer: GameRenderer
+  private _gameRenderer: GameRenderer;
+  private _gameBuilder: GameBuilder;
   private _currentCharacter: Character;
   private _borderWall: Cube[] = [];
   ngAfterViewInit() {
@@ -21,7 +24,7 @@ export class AppComponent implements AfterViewInit {
     this._gameRenderer.setGroundSize(groundWidth, groundHeight);
     this._gameRenderer.createScene();
     this._gameRenderer.animate();
-    
+
     let cube = new Cube(this._gameRenderer, new Vector3(0, 0.5, -groundHeight / 2), groundWidth + 1, 1, 1);
     cube.setTextureFromGallery('wall-bricks');
     this._borderWall.push(cube);
