@@ -1,6 +1,6 @@
 import { Vector3 } from 'babylonjs';
 
-import { GameRenderer } from '../shared/engine';
+import { GameRenderer, IRendererGraphicOptions, RendererGraphicOptions, ERendererShadowsQuality } from '../shared/engine';
 import { IBaseModel, Character, Cube, Ground, Sphere } from '../shared/engine/object';
 
 import { BombermanGameMap } from './gameMap';
@@ -66,7 +66,10 @@ export class GameBuilder {
       new Vector3(((size.width % 2) / 2) + Math.floor(size.width / 2), 0, ((size.height % 2) / 2) + Math.floor(size.height / 2)),
       size.width,
       size.height,
-      this.findGroundTexture(gameTheme)
+      this.findGroundTexture(gameTheme), {
+        shadowsEnabled: true,
+        shadowsQuality: ERendererShadowsQuality.high
+      }
     );
     this.buildBorder(gameTheme, size);
     this.generateIndestructibleWalls(gameTheme, size);
@@ -91,31 +94,35 @@ export class GameBuilder {
 
   private buildBorder(gameTheme: IBombermanGameTheme, size: IBombermanGameSize) {
     const borderTexture = this.findIndestructibleTexture(gameTheme);
+    const borderGraphicsOptions = {
+      shadowsEnabled: true,
+      shadowsQuality: ERendererShadowsQuality.high
+    };
     let cube = new Cube(
       this._gameRenderer,
       new Vector3(size.width / 2, this._wallHeight / 2, -0.5),
-      size.width + 2, this._wallHeight, 1, false
+      size.width + 2, this._wallHeight, 1, false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
       new Vector3(size.width / 2, this._wallHeight / 2, size.height + 0.5),
-      size.width + 2, this._wallHeight, 1, false
+      size.width + 2, this._wallHeight, 1, false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
       new Vector3(-0.5, this._wallHeight / 2, size.height / 2),
-      1, this._wallHeight, size.height, false
+      1, this._wallHeight, size.height, false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
       new Vector3(size.width + 0.5, this._wallHeight / 2, size.height / 2),
-      1, this._wallHeight, size.height, false
+      1, this._wallHeight, size.height, false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
@@ -130,7 +137,9 @@ export class GameBuilder {
         const cube = new Cube(
           this._gameRenderer,
           new Vector3(i - 0.5, this._wallHeight / 2, j - 0.5),
-          1, this._wallHeight, 1, false
+          1, this._wallHeight, 1, false, {
+            shadowsEnabled: false,
+          }
         );
         cube.setTextureFromGallery(borderTexture);
         this._indestructibleWalls.push(cube);
@@ -165,6 +174,9 @@ export class GameBuilder {
                 }
               }
             ]
+          }, null, {
+            shadowsEnabled: true,
+            shadowsQuality: ERendererShadowsQuality.high
           }
         );
         this._currentCharacter.buildFromGallery(character.characterModel, () => {
@@ -178,7 +190,10 @@ export class GameBuilder {
         this._gameMap.addPlayerPosition(currentPosition[0], currentPosition[1]);
         const newCharacter = new Character(
           this._gameRenderer,
-          new Vector3(currentPosition[0] - 0.5, 0, currentPosition[1] - 0.5)
+          new Vector3(currentPosition[0] - 0.5, 0, currentPosition[1] - 0.5), null, null, {
+            shadowsEnabled: true,
+            shadowsQuality: ERendererShadowsQuality.high
+          }
         );
         newCharacter.buildFromGallery(character.characterModel, () => {
         });
