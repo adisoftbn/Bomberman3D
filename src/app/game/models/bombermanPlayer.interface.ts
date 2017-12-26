@@ -1,21 +1,14 @@
-
 export enum EPlayerCharacterType {
-  Current = 'CURRENT',
-  Network = 'NETWORK',
-  ComputerEasy = 'COMPUTER_EASY',
-  ComputerMedium = 'COMPUTER_MEDIUM',
-  ComputerHard = 'COMPUTER_HARD'
-}
-
-interface ICharacterPosition {
-  x: number;
-  y: number;
+  current = 'CURRENT',
+  network = 'NETWORK',
+  computerEasy = 'COMPUTER_EASY',
+  computerMedium = 'COMPUTER_MEDIUM',
+  computerHard = 'COMPUTER_HARD'
 }
 
 export interface IBombermanPlayer {
   name: string;
   playerType: EPlayerCharacterType;
   characterName: string;
-  initialPosition: ICharacterPosition;
   characterModel: string;
 }
