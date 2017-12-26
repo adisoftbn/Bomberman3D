@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 
-import { IGameRenderer, GameRenderer } from './shared/engine';
+import { texturesUrl, charactersData } from './config';
+import { GameRenderer } from './shared/engine';
 
 import { EPlayerCharacterType } from './game/models';
 
@@ -18,6 +19,8 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this._gameRenderer = new GameRenderer('renderCanvas');
+    this._gameRenderer.getTextureGallery().initTextureObjects(texturesUrl);
+    this._gameRenderer.getCharacterGallery().initCharacterObjects(charactersData);
     this._gameBuilder = new GameBuilder(this._gameRenderer);
     this._gameThemes = new GameThemes();
     this._gameRenderer.animate();
@@ -26,31 +29,24 @@ export class AppComponent implements AfterViewInit {
       [
         {
           name: 'Unknown player',
-          playerType: EPlayerCharacterType.Current,
+          playerType: EPlayerCharacterType.current,
           characterName: 'Unknown',
-          initialPosition: {
-            x: 1,
-            y: 2
-          },
           characterModel: 'rabbit'
         },
         {
           name: 'Unknown player',
-          playerType: EPlayerCharacterType.ComputerEasy,
+          playerType: EPlayerCharacterType.computerEasy,
           characterName: 'Unknown',
-          initialPosition: {
-            x: 1,
-            y: 3
-          },
           characterModel: 'dude'
         }
       ],
       this._gameThemes.getThemeByName('theme1'),
       {
-        width: 10,
+        width: 11,
         height: 10
       }
     );
+    // this._gameRenderer.getScene().debugLayer.show();
   }
 
 }
