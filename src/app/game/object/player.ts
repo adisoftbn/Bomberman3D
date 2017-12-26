@@ -6,7 +6,6 @@ import { GameBuilder } from '../';
 
 import { Character } from '../../shared/engine/object';
 import { BombermanPlayerStats, EPlayerCharacterType, IBombermanPlayerModel } from '../model';
-import { ERendererShadowQuality } from '../../shared/engine';
 
 export class BombermanPlayer implements IBombermanPlayer {
   private _gameBuilder: GameBuilder;
@@ -35,7 +34,7 @@ export class BombermanPlayer implements IBombermanPlayer {
             }
           ]
         }, null, {
-          shadowsEnabled: this._gameBuilder.getGameGraphicsOptions().charactersShadowEnabled,
+          shadowEnabled: this._gameBuilder.getGameGraphicsOptions().charactersShadowEnabled,
           shadowQuality: this._gameBuilder.getGameGraphicsOptions().charactersShadowQuality
         }
       );
@@ -51,8 +50,8 @@ export class BombermanPlayer implements IBombermanPlayer {
       this.character = new Character(
         this._gameBuilder.getGameRenderer(),
         new Vector3(initialPosition[0] - 0.5, 0, initialPosition[1] - 0.5), null, null, {
-          shadowsEnabled: true,
-          shadowQuality: ERendererShadowQuality.high
+          shadowEnabled: this._gameBuilder.getGameGraphicsOptions().charactersShadowEnabled,
+          shadowQuality: this._gameBuilder.getGameGraphicsOptions().charactersShadowQuality
         }
       );
       this.character.buildFromGallery(character.characterModel, () => {

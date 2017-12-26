@@ -12,4 +12,6 @@ export class BombermanMediumGraphicsOptions implements IBombermanGraphicsOptions
   destructibleWallShadowQuality = ERendererShadowQuality.medium;
   charactersShadowEnabled = true;
   charactersShadowQuality = ERendererShadowQuality.medium;
+  temporaryItemsShadowEnabled = true;
+  temporaryItemsShadowQuality = ERendererShadowQuality.medium;
 }

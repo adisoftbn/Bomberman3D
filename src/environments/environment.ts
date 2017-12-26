@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,
-  graphicsOptions: 'medium'
+  graphicsOptions: 'low'
 };

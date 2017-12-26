@@ -1,7 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 
 import { texturesUrl, charactersData, themesData } from './config';
-import { GameRenderer, ERendererShadowQuality } from './shared/engine';
+import { GameRenderer } from './shared/engine';
 
 import { EPlayerCharacterType } from './game/model';
 import {
@@ -39,7 +39,7 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this._gameRenderer = new GameRenderer('renderCanvas', {
-      shadowsEnabled: this._graphicsOptions.worldShadowEnabled,
+      shadowEnabled: this._graphicsOptions.worldShadowEnabled,
       shadowQuality: this._graphicsOptions.worldShadowQuality
     });
     this._gameRenderer.getTextureGallery().initTextureObjects(texturesUrl);

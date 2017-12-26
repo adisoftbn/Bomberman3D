@@ -12,4 +12,6 @@ export class BombermanLowGraphicsOptions implements IBombermanGraphicsOptions {
   destructibleWallShadowQuality = ERendererShadowQuality.low;
   charactersShadowEnabled = true;
   charactersShadowQuality = ERendererShadowQuality.low;
+  temporaryItemsShadowEnabled = false;
+  temporaryItemsShadowQuality = ERendererShadowQuality.low;
 }

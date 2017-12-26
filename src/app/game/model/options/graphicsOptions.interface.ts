@@ -11,4 +11,6 @@ export interface IBombermanGraphicsOptions {
   destructibleWallShadowQuality: ERendererShadowQuality;
   charactersShadowEnabled: boolean;
   charactersShadowQuality: ERendererShadowQuality;
+  temporaryItemsShadowEnabled: boolean;
+  temporaryItemsShadowQuality: ERendererShadowQuality;
 }

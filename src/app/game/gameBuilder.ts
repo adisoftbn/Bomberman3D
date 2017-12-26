@@ -1,7 +1,7 @@
 import { Vector3 } from 'babylonjs';
 
-import { GameRenderer, IRendererGraphicOptions, RendererGraphicOptions, ERendererShadowQuality } from '../shared/engine';
-import { IBaseModel, Character, Cube, Ground, Sphere } from '../shared/engine/object';
+import { GameRenderer } from '../shared/engine';
+import { Cube, Ground } from '../shared/engine/object';
 
 import { BombermanGameMap } from './gameMap';
 
@@ -70,7 +70,7 @@ export class GameBuilder {
       size.width,
       size.height,
       this.findGroundTexture(gameTheme), {
-        shadowsEnabled: this._gameGraphicsOptions.worldShadowEnabled,
+        shadowEnabled: this._gameGraphicsOptions.worldShadowEnabled,
         shadowQuality: this._gameGraphicsOptions.worldShadowQuality
       }
     );
@@ -83,7 +83,7 @@ export class GameBuilder {
   private buildBorder(gameTheme: IBombermanGameTheme, size: IBombermanGameSize) {
     const borderTexture = this.findIndestructibleTexture(gameTheme);
     const borderGraphicsOptions = {
-      shadowsEnabled: this._gameGraphicsOptions.borderWallShadowEnabled,
+      shadowEnabled: this._gameGraphicsOptions.borderWallShadowEnabled,
       shadowQuality: this._gameGraphicsOptions.borderWallShadowQuality
     };
     let cube = new Cube(
@@ -123,7 +123,8 @@ export class GameBuilder {
         this._gameRenderer,
         new Vector3(position[0] - 0.5, this._wallHeight / 2, position[1] - 0.5),
         1, this._wallHeight, 1, false, {
-          shadowsEnabled: false,
+          shadowEnabled: this.getGameGraphicsOptions().indestructibleWallShadowEnabled,
+          shadowQuality: this.getGameGraphicsOptions().indestructibleWallShadowQuality
         }
       );
       cube.setTextureFromGallery(borderTexture);
