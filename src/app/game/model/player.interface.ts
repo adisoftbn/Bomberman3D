@@ -6,7 +6,7 @@ export enum EPlayerCharacterType {
   computerHard = 'COMPUTER_HARD'
 }
 
-export interface IBombermanPlayer {
+export interface IBombermanPlayerModel {
   name: string;
   playerType: EPlayerCharacterType;
   characterName: string;

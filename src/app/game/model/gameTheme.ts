@@ -1,4 +1,4 @@
-import { IBombermanGameTheme } from './bombermanGameTheme.interface';
+import { IBombermanGameTheme } from './gameTheme.interface';
 import { DefaultAlgs } from '../defaultAlgorithms';
 export class BombermanGameTheme implements IBombermanGameTheme {
   name: 'unknown-theme';
@@ -21,5 +21,4 @@ export class BombermanGameTheme implements IBombermanGameTheme {
   indestructibleWallPlacementAlgorithm = DefaultAlgs.defaultIndestructibleWallPlacementAlgorithm;
   destructibleWallPlacementAlgorithm = DefaultAlgs.defaultDestructibleWallPlacementAlgorithm;
   playerPlacementAlgorithm = DefaultAlgs.defaultPlayerPlacementAlgorithm;
-
 }

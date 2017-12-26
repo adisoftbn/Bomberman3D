@@ -4,7 +4,8 @@ export interface IBombermanGameWallTextures {
   indestructibleWalls: string[];
   destructibleWalls: string[];
 }
-export type BombermanGameMapFunction = (gameMap: BombermanGameMap) => void;
+export type BombermanGameMapFunction = (gameMap: BombermanGameMap) => any[];
+export type BombermanGameMapPlayersFunction = (gameMap: BombermanGameMap, playersCount: number) => any[];
 
 export interface IBombermanGameTheme {
   name: string;
@@ -15,5 +16,5 @@ export interface IBombermanGameTheme {
   avilableCharacters: string[];
   indestructibleWallPlacementAlgorithm?: BombermanGameMapFunction;
   destructibleWallPlacementAlgorithm?: BombermanGameMapFunction;
-  playerPlacementAlgorithm?: BombermanGameMapFunction;
+  playerPlacementAlgorithm?: BombermanGameMapPlayersFunction;
 }
