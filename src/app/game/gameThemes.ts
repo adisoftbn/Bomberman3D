@@ -15,7 +15,17 @@ export class GameThemes {
       newThemeItem.description = theme.description;
       newThemeItem.groundTextures = theme.groundTextures;
       newThemeItem.wallTextures = theme.wallTextures;
+      newThemeItem.wallTypes = theme.wallTypes;
       newThemeItem.avilableCharacters = theme.avilableCharacters;
+
+      newThemeItem.bombTexture1 = theme.bombTexture1;
+      newThemeItem.bombTexture2 = theme.bombTexture2;
+      newThemeItem.fireColor1 = theme.fireColor1;
+      newThemeItem.fireColor2 = theme.fireColor2;
+      newThemeItem.fireColor3 = theme.fireColor3;
+      newThemeItem.fireParticlesTexture = theme.fireParticlesTexture;
+      newThemeItem.backgroundColor = theme.backgroundColor;
+
       newThemeItem.indestructibleWallPlacementAlgorithm = theme.indestructibleWallPlacementAlgorithm;
       newThemeItem.destructibleWallPlacementAlgorithm = theme.destructibleWallPlacementAlgorithm;
       newThemeItem.playerPlacementAlgorithm = theme.playerPlacementAlgorithm;

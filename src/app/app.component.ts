@@ -30,7 +30,7 @@ export class AppComponent implements AfterViewInit {
       this._graphicsOptions = new BombermanLowGraphicsOptions();
     } else if (environment.graphicsOptions === 'medium') {
       this._graphicsOptions = new BombermanMediumGraphicsOptions();
-    } else if (environment.graphicsOptions === 'medium') {
+    } else if (environment.graphicsOptions === 'high') {
       this._graphicsOptions = new BombermanHighGraphicsOptions();
     } else {
       this._graphicsOptions = new BombermanVeryLowGraphicsOptions();

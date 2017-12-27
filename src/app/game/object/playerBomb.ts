@@ -1,6 +1,6 @@
-import { Vector3 } from 'babylonjs';
+import { Vector3, MeshBuilder, Mesh, ParticleSystem } from 'babylonjs';
 
-import { Sphere } from '../../shared/engine/object';
+import { Sphere, Torus, ParticleEmitter } from '../../shared/engine/object';
 
 import { GameBuilder } from '../';
 import { IBombermanPlayerStats } from '../model';
@@ -8,21 +8,205 @@ import { IBombermanPlayerStats } from '../model';
 
 export class BombermanPlayerBomb {
   private _gameBuilder: GameBuilder;
-  constructor(gameBuilder: GameBuilder, playerStats: IBombermanPlayerStats, position: Vector3, doneCallback: Function) {
+  constructor(gameBuilder: GameBuilder, playerStats: IBombermanPlayerStats, position: Vector3,
+    scanMapCallback: Function, doneCallback: Function
+  ) {
     this._gameBuilder = gameBuilder;
+
+    const cachedBombTimeout = playerStats.bombTimeout;
+    const cachedBombPower = playerStats.bombPower;
+
     const sphere = new Sphere(this._gameBuilder.getGameRenderer(), new Vector3(position.x, 0.15, position.z), 0.3, {
       shadowEnabled: this._gameBuilder.getGameGraphicsOptions().temporaryItemsShadowEnabled,
       shadowQuality: this._gameBuilder.getGameGraphicsOptions().temporaryItemsShadowQuality
     });
-    sphere.setTextureFromGallery('test');
-    const scaleInterval = setInterval(() => {
 
-    }, 5);
+    const torus = new Torus(this._gameBuilder.getGameRenderer(), new Vector3(0.1, 0.1, 0), 0.05, 0.05, {
+      shadowEnabled: this._gameBuilder.getGameGraphicsOptions().temporaryItemsShadowEnabled,
+      shadowQuality: this._gameBuilder.getGameGraphicsOptions().temporaryItemsShadowQuality
+    });
+
+    const torusModel = torus.getModel();
+    const sphereModel = sphere.getModel();
+
+    torusModel.parent = sphereModel;
+    torusModel.position.y = 0.1;
+    torusModel.position.x = 0.1;
+    torusModel.rotate(BABYLON.Axis.Z, -Math.PI / 4, BABYLON.Space.LOCAL);
+
+    const particles = new ParticleEmitter(
+      this._gameBuilder.getGameRenderer(),
+      sphereModel,
+      {
+        start: new BABYLON.Vector3(0.05, 0.05, 0),
+        end: new BABYLON.Vector3(0.2, 0.2, 0),
+      },
+      {
+        direction1: new BABYLON.Vector3(0.1, 0.1, 0),
+        direction2: new BABYLON.Vector3(0.1, 0.1, 0)
+      },
+      {
+        color1: this._gameBuilder.getGameTheme().getFireColor1(),
+        color2: this._gameBuilder.getGameTheme().getFireColor2(),
+        deadColor: this._gameBuilder.getGameTheme().getFireColor3()
+      },
+      {
+        minSize: 0.1,
+        maxSize: 0.5,
+        minLifeTime: 0.5,
+        maxLifeTime: 1.5,
+        emitRate: 150,
+        maxParticles: 2000
+      }
+    );
+    particles.setTextureFromGallery(this._gameBuilder.getGameTheme().fireParticlesTexture);
+
+
+    const startTime = performance.now();
+    const endTime = startTime + playerStats.bombTimeout;
+
+    sphere.setTextureFromGallery(this._gameBuilder.getGameTheme().bombTexture1);
+    torus.setTextureFromGallery(this._gameBuilder.getGameTheme().bombTexture2);
+    let exploded = false;
+    let explosionStep = 1;
+    let flares = {};
+    sphereModel.registerBeforeRender((mesh) => {
+      if (explosionStep === 1) {
+        if (!exploded) {
+          const elapsedTime = performance.now() - startTime;
+          const scaleValue = (Math.sin((elapsedTime / playerStats.bombTimeout) * 10 * Math.PI) + 1) / 4 + 0.9;
+          mesh.scaling.set(scaleValue, scaleValue, scaleValue);
+        }
+      } else if (explosionStep === 2) {
+        explosionStep = 3;
+        sphereModel.scaling.set(1, 1, 1);
+        particles.stop();
+        const result = scanMapCallback(cachedBombPower);
+        flares = this.createFireFlares(sphereModel, result.x1, result.x2, result.y1, result.y2, () => {
+          explosionStep = 4;
+        });
+      } else if (explosionStep === 4) {
+        explosionStep = 5;
+        (flares as any).maxX1Particles.stop();
+        (flares as any).maxX2Particles.stop();
+        (flares as any).maxY1Particles.stop();
+        (flares as any).maxY2Particles.stop();
+        sphereModel.material.alpha = 0;
+        torusModel.material.alpha = 0;
+        particles.destroy();
+        setTimeout(() => {
+          explosionStep = 6;
+        }, 300);
+      } else if (explosionStep === 6) {
+        explosionStep = 7;
+        (flares as any).maxX1Particles.destroy();
+        (flares as any).maxX2Particles.destroy();
+        (flares as any).maxY1Particles.destroy();
+        (flares as any).maxY2Particles.destroy();
+        torus.destroy();
+        doneCallback();
+      }
+    });
+
     setTimeout(() => {
-      sphere.destroy();
-      doneCallback();
-    }, 3000);
+      explosionStep = 2;
+      exploded = true;
+    }, playerStats.bombTimeout);
+  }
 
+  createFireFlares(model: Mesh, maxX1: number, maxX2: number, maxY1: number, maxY2: number, callback: Function) {
+    const particleOptions = {
+      minSize: 1,
+      maxSize: 3,
+      minLifeTime: 0.0,
+      maxLifeTime: 0.5,
+      emitRate: 1500,
+      maxParticles: 2000,
+      noGravity: true,
+      minEmitPower: 1,
+      maxEmitPower: 1,
+      updateSpeed: 0.1
+    };
+
+    const particleColors = {
+      color1: this._gameBuilder.getGameTheme().getFireColor1(),
+      color2: this._gameBuilder.getGameTheme().getFireColor2(),
+      deadColor: this._gameBuilder.getGameTheme().getFireColor3()
+    };
+
+    const maxX1Particles = new ParticleEmitter(
+      this._gameBuilder.getGameRenderer(),
+      model,
+      {
+        start: new BABYLON.Vector3(0, 0, -0.2),
+        end: new BABYLON.Vector3(maxX1, 0, 0.2),
+      },
+      {
+        direction1: new BABYLON.Vector3(1, 0, 0),
+        direction2: new BABYLON.Vector3(1, 0, 0)
+      },
+      particleColors,
+      particleOptions
+    );
+    maxX1Particles.setTextureFromGallery(this._gameBuilder.getGameTheme().fireParticlesTexture);
+
+    const maxX2Particles = new ParticleEmitter(
+      this._gameBuilder.getGameRenderer(),
+      model,
+      {
+        start: new BABYLON.Vector3(0, 0, -0.2),
+        end: new BABYLON.Vector3(-maxX2, 0, 0.2),
+      },
+      {
+        direction1: new BABYLON.Vector3(-1, 0, 0),
+        direction2: new BABYLON.Vector3(-1, 0, 0)
+      },
+      particleColors,
+      particleOptions
+    );
+    maxX2Particles.setTextureFromGallery(this._gameBuilder.getGameTheme().fireParticlesTexture);
+
+    const maxY1Particles = new ParticleEmitter(
+      this._gameBuilder.getGameRenderer(),
+      model,
+      {
+        start: new BABYLON.Vector3(-0.2, 0, 0),
+        end: new BABYLON.Vector3(0.2, 0, maxY1),
+      },
+      {
+        direction1: new BABYLON.Vector3(0, 0, 1),
+        direction2: new BABYLON.Vector3(0, 0, 1)
+      },
+      particleColors,
+      particleOptions
+    );
+    maxY1Particles.setTextureFromGallery(this._gameBuilder.getGameTheme().fireParticlesTexture);
+
+    const maxY2Particles = new ParticleEmitter(
+      this._gameBuilder.getGameRenderer(),
+      model,
+      {
+        start: new BABYLON.Vector3(-0.2, 0, 0),
+        end: new BABYLON.Vector3(0.2, 0, -maxY2),
+      },
+      {
+        direction1: new BABYLON.Vector3(0, 0, -1),
+        direction2: new BABYLON.Vector3(0, 0, -1)
+      },
+      particleColors,
+      particleOptions
+    );
+    maxY2Particles.setTextureFromGallery(this._gameBuilder.getGameTheme().fireParticlesTexture);
+    setTimeout(() => {
+      callback();
+    }, 300);
+
+    return {
+      maxX1Particles,
+      maxX2Particles,
+      maxY1Particles,
+      maxY2Particles
+    }
   }
 }
 

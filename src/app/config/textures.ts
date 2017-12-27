@@ -77,4 +77,58 @@ export const texturesUrl = [
     mq: 'wall/aged-building-facade-mq.jpg',
     lq: 'wall/aged-building-facade-lq.jpg'
   },
+
+
+
+  {
+    name: 'particles-flare',
+    hq: 'particles/flare.png',
+    mq: 'particles/flare.png',
+    lq: 'particles/flare.png'
+  },
+  {
+    name: 'small-items-metal2',
+    hq: 'small-items/metal2-hq.jpg',
+    mq: 'small-items/metal2-hq.jpg',
+    lq: 'small-items/metal2-hq.jpg'
+  },
+
+
+
+  {
+    name: 'rewards-detonate-later',
+    hq: 'rewards/detonate-later-hq.jpg',
+    mq: 'rewards/detonate-later-hq.jpg',
+    lq: 'rewards/detonate-later-hq.jpg'
+  },
+  {
+    name: 'rewards-energy-decrease',
+    hq: 'rewards/energy-decrease-hq.jpg',
+    mq: 'rewards/energy-decrease-hq.jpg',
+    lq: 'rewards/energy-decrease-hq.jpg'
+  },
+  {
+    name: 'rewards-energy-increase',
+    hq: 'rewards/energy-increase-hq.jpg',
+    mq: 'rewards/energy-increase-hq.jpg',
+    lq: 'rewards/energy-increase-hq.jpg'
+  },
+  {
+    name: 'rewards-rewards-increase',
+    hq: 'rewards/rewards-increase-hq.jpg',
+    mq: 'rewards/rewards-increase-hq.jpg',
+    lq: 'rewards/rewards-increase-hq.jpg'
+  },
+  {
+    name: 'rewards-speed-decrease',
+    hq: 'rewards/speed-decrease-hq.jpg',
+    mq: 'rewards/speed-decrease-hq.jpg',
+    lq: 'rewards/speed-decrease-hq.jpg'
+  },
+  {
+    name: 'rewards-speed-increase',
+    hq: 'rewards/speed-increase-hq.jpg',
+    mq: 'rewards/speed-increase-hq.jpg',
+    lq: 'rewards/speed-increase-hq.jpg'
+  },
 ];

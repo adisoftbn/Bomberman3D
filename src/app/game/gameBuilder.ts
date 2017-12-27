@@ -1,13 +1,13 @@
 import { Vector3 } from 'babylonjs';
 
 import { GameRenderer } from '../shared/engine';
-import { Cube, Ground } from '../shared/engine/object';
+import { BaseModel, Cube, Ground } from '../shared/engine/object';
 
 import { BombermanGameMap } from './gameMap';
 
-import { EPlayerCharacterType, BombermanPlayerStats, IBombermanPlayerModel, IBombermanGameTheme, IBombermanGameSize } from './model';
+import { EPlayerCharacterType, BombermanPlayerStats, IBombermanPlayerModel, BombermanGameTheme, IBombermanGameSize } from './model';
 import { IBombermanGraphicsOptions } from './model/options';
-import { BombermanPlayer } from './object';
+import { BombermanPlayer, DestructibleWall, EBombermanWallType } from './object';
 
 
 export class GameBuilder {
@@ -16,7 +16,7 @@ export class GameBuilder {
   private _ground: Ground;
   private _borderWall: Cube[] = [];
   private _indestructibleWalls: Cube[] = [];
-  private _destructibleWalls: Cube[] = [];
+  private _destructibleWalls: BaseModel[] = [];
 
 
   private _curretPlayerStats: BombermanPlayerStats;
@@ -24,6 +24,7 @@ export class GameBuilder {
   private _players: BombermanPlayer[] = [];
 
   private _gameMap: BombermanGameMap;
+  private _gameTheme: BombermanGameTheme;
 
 
   protected _wallHeight = 0.7;
@@ -40,21 +41,36 @@ export class GameBuilder {
     this._gameMap = new BombermanGameMap();
   }
 
-  public findGroundTexture(gameTheme: IBombermanGameTheme): string {
-    return gameTheme.groundTextures[
-      Math.floor(Math.random() * gameTheme.groundTextures.length)
+  public findGroundTexture(): string {
+    return this._gameTheme.groundTextures[
+      Math.floor(Math.random() * this._gameTheme.groundTextures.length)
     ];
   }
 
-  public findDestructibleTexture(gameTheme: IBombermanGameTheme): string {
-    return gameTheme.wallTextures.destructibleWalls[
-      Math.floor(Math.random() * gameTheme.wallTextures.destructibleWalls.length)
+  public findDestructibleTexture(): string {
+    return this._gameTheme.wallTextures.destructibleWalls[
+      Math.floor(Math.random() * this._gameTheme.wallTextures.destructibleWalls.length)
     ];
   }
+  public findDestructibleWallType(): EBombermanWallType {
+    const wallType = this._gameTheme.wallTypes.destructibleWalls[
+      Math.floor(Math.random() * this._gameTheme.wallTextures.destructibleWalls.length)
+    ];
+    if (wallType === 'cube') {
+      return EBombermanWallType.cube;
+    } else if (wallType === 'small-cube') {
+      return EBombermanWallType.smallCube;
+    } else if (wallType === 'cylinder') {
+      return EBombermanWallType.cylinder;
+    } else if (wallType === 'sphere') {
+      return EBombermanWallType.sphere;
+    }
+    return EBombermanWallType.cube;
+  }
 
-  public findIndestructibleTexture(gameTheme: IBombermanGameTheme): string {
-    return gameTheme.wallTextures.indestructibleWalls[
-      Math.floor(Math.random() * gameTheme.wallTextures.indestructibleWalls.length)
+  public findIndestructibleTexture(): string {
+    return this._gameTheme.wallTextures.indestructibleWalls[
+      Math.floor(Math.random() * this._gameTheme.wallTextures.indestructibleWalls.length)
     ];
   }
 
@@ -62,63 +78,69 @@ export class GameBuilder {
 
   }
 
-  public buildBombermanGame(players: IBombermanPlayerModel[], gameTheme: IBombermanGameTheme, size: IBombermanGameSize) {
+  public buildBombermanGame(players: IBombermanPlayerModel[], gameTheme: BombermanGameTheme, size: IBombermanGameSize) {
+    this._gameTheme = gameTheme;
     this._gameMap.createMap(size.width, size.height);
     this._ground = new Ground(
       this._gameRenderer,
-      new Vector3(((size.width % 2) / 2) + Math.floor(size.width / 2), 0, ((size.height % 2) / 2) + Math.floor(size.height / 2)),
-      size.width,
-      size.height,
-      this.findGroundTexture(gameTheme), {
+      new Vector3(
+        ((this._gameMap.getWidth() % 2) / 2) + Math.floor(this._gameMap.getWidth() / 2),
+        0,
+        ((this._gameMap.getHeight() % 2) / 2) + Math.floor(this._gameMap.getHeight() / 2)
+      ),
+      this._gameMap.getWidth(),
+      this._gameMap.getHeight(),
+      this.findGroundTexture(), {
         shadowEnabled: this._gameGraphicsOptions.worldShadowEnabled,
         shadowQuality: this._gameGraphicsOptions.worldShadowQuality
       }
     );
-    this.buildBorder(gameTheme, size);
-    this.generateIndestructibleWalls(gameTheme);
-    this.buildPlayers(gameTheme, players);
-    this.generateDestructibleWalls(gameTheme);
+    this.buildBorder();
+    this.generateIndestructibleWalls();
+    this.buildPlayers(players);
+    this.generateDestructibleWalls();
+    this._gameMap.makeMapReady();
   }
 
-  private buildBorder(gameTheme: IBombermanGameTheme, size: IBombermanGameSize) {
-    const borderTexture = this.findIndestructibleTexture(gameTheme);
+  private buildBorder() {
+    const borderTexture = this.findIndestructibleTexture();
     const borderGraphicsOptions = {
       shadowEnabled: this._gameGraphicsOptions.borderWallShadowEnabled,
       shadowQuality: this._gameGraphicsOptions.borderWallShadowQuality
     };
     let cube = new Cube(
       this._gameRenderer,
-      new Vector3(size.width / 2, this._wallHeight / 2, -0.5),
-      size.width + 2, this._wallHeight, 1, false, borderGraphicsOptions
+      new Vector3(this._gameMap.getWidth() / 2, this._wallHeight / 2, -0.5),
+      this._gameMap.getWidth() + 2, this._wallHeight, 1, false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
-      new Vector3(size.width / 2, this._wallHeight / 2, size.height + 0.5),
-      size.width + 2, this._wallHeight, 1, false, borderGraphicsOptions
+      new Vector3(this._gameMap.getWidth() / 2, this._wallHeight / 2, this._gameMap.getHeight() + 0.5),
+      this._gameMap.getWidth() + 2, this._wallHeight, 1, false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
-      new Vector3(-0.5, this._wallHeight / 2, size.height / 2),
-      1, this._wallHeight, size.height, false, borderGraphicsOptions
+      new Vector3(-0.5, this._wallHeight / 2, this._gameMap.getHeight() / 2),
+      1, this._wallHeight, this._gameMap.getHeight(), false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
-      new Vector3(size.width + 0.5, this._wallHeight / 2, size.height / 2),
-      1, this._wallHeight, size.height, false, borderGraphicsOptions
+      new Vector3(this._gameMap.getWidth() + 0.5, this._wallHeight / 2, this._gameMap.getHeight() / 2),
+      1, this._wallHeight, this._gameMap.getHeight(), false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
   }
 
-  private generateIndestructibleWalls(gameTheme: IBombermanGameTheme) {
-    gameTheme.indestructibleWallPlacementAlgorithm(this._gameMap).forEach(position => {
-      const borderTexture = this.findIndestructibleTexture(gameTheme);
+  private generateIndestructibleWalls() {
+    const cubeTexture = this.findIndestructibleTexture();
+    this._gameTheme.indestructibleWallPlacementAlgorithm(this._gameMap).forEach(position => {
       const cube = new Cube(
         this._gameRenderer,
         new Vector3(position[0] - 0.5, this._wallHeight / 2, position[1] - 0.5),
@@ -127,19 +149,20 @@ export class GameBuilder {
           shadowQuality: this.getGameGraphicsOptions().indestructibleWallShadowQuality
         }
       );
-      cube.setTextureFromGallery(borderTexture);
+      cube.setTextureFromGallery(cubeTexture);
       this._indestructibleWalls.push(cube);
       this._gameMap.addIndestructibleWall(position[0], position[1], cube);
     });
   }
 
-  private generateDestructibleWalls(gameTheme: IBombermanGameTheme) {
-    gameTheme.destructibleWallPlacementAlgorithm(this._gameMap).forEach(position => {
-      const cubeTexture = this.findDestructibleTexture(gameTheme);
-      const cube = new Cube(
-        this._gameRenderer,
+  private generateDestructibleWalls() {
+    const cubeTexture = this.findDestructibleTexture();
+    const wallType = this.findDestructibleWallType()
+    this._gameTheme.destructibleWallPlacementAlgorithm(this._gameMap).forEach(position => {
+      const cube = new DestructibleWall(
+        this,
         new Vector3(position[0] - 0.5, this._wallHeight / 2, position[1] - 0.5),
-        1, 0.7, 1, false
+        wallType
       );
       const randNr = Math.round(Math.random() * this._rewardMaxPosibilites);
       cube.setTextureFromGallery(cubeTexture);
@@ -153,8 +176,8 @@ export class GameBuilder {
 
   }
 
-  private buildPlayers(gameTheme: IBombermanGameTheme, players: IBombermanPlayerModel[]) {
-    const positions = gameTheme.playerPlacementAlgorithm(this._gameMap, players.length);
+  private buildPlayers(players: IBombermanPlayerModel[]) {
+    const positions = this._gameTheme.playerPlacementAlgorithm(this._gameMap, players.length);
     let index = 0;
     players.forEach(character => {
       index++;
@@ -170,11 +193,23 @@ export class GameBuilder {
     });
   }
 
+  flareDestroy(x: number, y: number, directions) {
+
+  }
+
   getGameGraphicsOptions(): IBombermanGraphicsOptions {
     return this._gameGraphicsOptions;
   }
 
   getGameRenderer(): GameRenderer {
     return this._gameRenderer;
+  }
+
+  getGameTheme(): BombermanGameTheme {
+    return this._gameTheme;
+  }
+
+  getGameMap(): BombermanGameMap {
+    return this._gameMap;
   }
 }

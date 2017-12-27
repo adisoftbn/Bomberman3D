@@ -2,19 +2,30 @@ export class BombermanGameMap {
   private _map = [];
   private _width = 1;
   private _height = 1;
+
+  public bombsCache = 0;
   constructor() {
 
   }
 
-  getWidth() {
+  public getWidth() {
     return this._width;
   }
 
-  getHeight() {
+  public getHeight() {
     return this._height;
   }
 
-  createMap(width: number, height: number) {
+  fixPosition(x: number, y: number) {
+    return {
+      cellX: Math.ceil(x),
+      cellY: Math.ceil(y),
+      x: Math.floor(x) + 0.5,
+      y: Math.floor(y) + 0.5
+    }
+  }
+
+  public createMap(width: number, height: number) {
     this._width = width;
     this._height = height;
     this._map = [];
@@ -26,14 +37,14 @@ export class BombermanGameMap {
     }
   }
 
-  addIndestructibleWall(x: number, y: number, object) {
+  public addIndestructibleWall(x: number, y: number, object) {
     this._map[x][y] = {
       type: 'indestructible-wall',
       object
     };
   }
 
-  addDestructibleWall(x: number, y: number, object, reward) {
+  public addDestructibleWall(x: number, y: number, object, reward) {
     this._map[x][y] = {
       type: 'destructible-wall',
       object,
@@ -41,7 +52,7 @@ export class BombermanGameMap {
     };
   }
 
-  addPlayerPosition(x: number, y: number) {
+  public addPlayerPosition(x: number, y: number) {
     this._map[x][y] = {
       type: 'initial-player-position'
     };
@@ -61,8 +72,50 @@ export class BombermanGameMap {
     }
   }
 
+  public addBomb(x: number, y: number) {
+    if (!this._map[x][y]) {
+      this._map[x][y] = {
+        type: 'bomb',
+      };
+      this.bombsCache++;
+      console.log(this.bombsCache);
+      return true;
+    }
+    return false;
+  }
+
+  public removeBomb(x: number, y: number) {
+    if (this._map[x][y] && this._map[x][y].type === 'bomb') {
+      this._map[x][y] = null;
+      this.bombsCache--;
+      console.log(this.bombsCache);
+      return true;
+    }
+    return false;
+  }
+
+  public makeMapReady() {
+    for (let i = 1; i <= this._width; i++) {
+      for (let j = 1; j <= this._height; j++) {
+        if (this._map[i][j] && (this._map[i][j].type === 'initial-player-position' || this._map[i][j].type === 'reserved')) {
+          this._map[i][j] = null;
+        }
+      }
+    }
+  }
+
+  public clearMapCell(x: number, y: number) {
+    if (this._map[x][y] && this._map[x][y].type === 'destructible-wall') {
+      this._map[x][y] = null;
+    }
+  }
+
   public getCell(x: number, y: number) {
     return this._map[x][y];
+  }
+
+  public canFireCell(x: number, y: number) {
+    return !this._map[x][y] || (this._map[x][y] && this._map[x][y].type === 'bomb');
   }
 
   public emptyBetween(x1, y1, x2, y2) {
@@ -81,6 +134,40 @@ export class BombermanGameMap {
       }
     }
     return true;
+  }
+
+  public getFlareDirections(x: number, y: number, flareWidth: number) {
+    const result = {
+      x1: 0,
+      x2: 0,
+      y1: 0,
+      y2: 0
+    };
+    for (let i = 1; i <= flareWidth; i++) {
+      result.x1++;
+      if (x + i >= this._width || !this.canFireCell(x + i, y)) {
+        break;
+      }
+    }
+    for (let i = 1; i <= flareWidth; i++) {
+      result.x2++;
+      if (x - i <= 1 || !this.canFireCell(x - i, y)) {
+        break;
+      }
+    }
+    for (let j = 1; j <= flareWidth; j++) {
+      result.y1++;
+      if (y + j >= this._height || !this.canFireCell(x, y + j)) {
+        break;
+      }
+    }
+    for (let j = 1; j <= flareWidth; j++) {
+      result.y2++;
+      if (y - j <= 1 || !this.canFireCell(x, y - j)) {
+        break;
+      }
+    }
+    return result;
   }
 
 }
