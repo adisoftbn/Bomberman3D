@@ -5,3 +5,4 @@ export * from './player';
 export * from './player.interface';
 export * from './playerStats.interface';
 export * from './playerStats';
+export * from './wallType';

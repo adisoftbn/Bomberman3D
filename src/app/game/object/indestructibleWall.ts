@@ -6,7 +6,7 @@ import { EBombermanWallType } from '../model';
 
 import { GameBuilder } from '../';
 
-export class DestructibleWall extends BaseModel {
+export class IndestructibleWall extends BaseModel {
   protected _gameBuilder: GameBuilder;
   protected _graphicsOptions: IRendererGraphicOptions;
   protected _meshType: EBombermanWallType
@@ -28,8 +28,8 @@ export class DestructibleWall extends BaseModel {
     this._gameBuilder = gameBuilder;
     this._meshType = meshType;
     this._graphicsOptions = {
-      shadowEnabled: this._gameBuilder.getGameGraphicsOptions().destructibleWallShadowEnabled,
-      shadowQuality: this._gameBuilder.getGameGraphicsOptions().destructibleWallShadowQuality
+      shadowEnabled: this._gameBuilder.getGameGraphicsOptions().indestructibleWallShadowEnabled,
+      shadowQuality: this._gameBuilder.getGameGraphicsOptions().indestructibleWallShadowQuality
     };
     this._initialPosition = initialPosition;
     this._modelMaterial = new StandardMaterial('model', this._gameRenderer.getScene());
@@ -134,27 +134,6 @@ export class DestructibleWall extends BaseModel {
       this._textureWidth = sizes['width'];
       this._textureHeight = sizes['height'];
       this.buildModel();
-    });
-  }
-
-  public killWall(finishCallback: Function) {
-    const startTime = performance.now();
-    const animationLength = 1000;
-    const endTime = startTime + animationLength;
-    let finished = false;
-    this._model.registerBeforeRender((mesh) => {
-      if (!finished) {
-        if (performance.now() >= endTime) {
-          finished = true;
-          this._model.registerAfterRender(() => {
-            finishCallback();
-          });
-        } else {
-          const scaleValue = (endTime - performance.now()) / animationLength;
-          mesh.scaling.set(scaleValue, scaleValue, scaleValue);
-          mesh.material.alpha = scaleValue;
-        }
-      }
     });
   }
 

@@ -52,6 +52,17 @@ export class BombermanGameMap {
     };
   }
 
+  public removeDestructibleWall(x: number, y: number) {
+    if (this._map[x][y] && this._map[x][y].type === 'destructible-wall') {
+      this._map[x][y] = null;
+      this.bombsCache--;
+      return true;
+    }
+    return false;
+  }
+
+
+
   public addPlayerPosition(x: number, y: number) {
     this._map[x][y] = {
       type: 'initial-player-position'
@@ -78,7 +89,6 @@ export class BombermanGameMap {
         type: 'bomb',
       };
       this.bombsCache++;
-      console.log(this.bombsCache);
       return true;
     }
     return false;
@@ -88,7 +98,6 @@ export class BombermanGameMap {
     if (this._map[x][y] && this._map[x][y].type === 'bomb') {
       this._map[x][y] = null;
       this.bombsCache--;
-      console.log(this.bombsCache);
       return true;
     }
     return false;
@@ -165,6 +174,54 @@ export class BombermanGameMap {
       result.y2++;
       if (y - j <= 1 || !this.canFireCell(x, y - j)) {
         break;
+      }
+    }
+    return result;
+  }
+  getFlareAffectedCells(x: number, y: number, directions) {
+    const result = [];
+    for (let i = 1; i <= directions.x1; i++) {
+      if (x + i <= this._width) {
+        if (this._map[x + i][y]) {
+          result.push({
+            x: x + i,
+            y: y,
+            contents: this._map[x + i][y]
+          });
+        }
+      }
+    }
+    for (let i = 1; i <= directions.x2; i++) {
+      if (x - i >= 1) {
+        if (this._map[x - i][y]) {
+          result.push({
+            x: x - i,
+            y: y,
+            contents: this._map[x - i][y]
+          });
+        }
+      }
+    }
+    for (let j = 1; j <= directions.y1; j++) {
+      if (y + j <= this._height) {
+        if (this._map[x][y + j]) {
+          result.push({
+            x: x,
+            y: y + j,
+            contents: this._map[x][y + j]
+          });
+        }
+      }
+    }
+    for (let j = 1; j <= directions.y2; j++) {
+      if (y - j >= 1) {
+        if (this._map[x][y - j]) {
+          result.push({
+            x: x,
+            y: y - j,
+            contents: this._map[x][y - j]
+          });
+        }
       }
     }
     return result;

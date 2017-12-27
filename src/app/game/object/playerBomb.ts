@@ -63,7 +63,7 @@ export class BombermanPlayerBomb {
 
 
     const startTime = performance.now();
-    const endTime = startTime + playerStats.bombTimeout;
+    const endTime = startTime + cachedBombTimeout;
 
     sphere.setTextureFromGallery(this._gameBuilder.getGameTheme().bombTexture1);
     torus.setTextureFromGallery(this._gameBuilder.getGameTheme().bombTexture2);
@@ -74,7 +74,7 @@ export class BombermanPlayerBomb {
       if (explosionStep === 1) {
         if (!exploded) {
           const elapsedTime = performance.now() - startTime;
-          const scaleValue = (Math.sin((elapsedTime / playerStats.bombTimeout) * 10 * Math.PI) + 1) / 4 + 0.9;
+          const scaleValue = (Math.sin((elapsedTime / cachedBombTimeout) * 10 * Math.PI) + 1) / 4 + 0.9;
           mesh.scaling.set(scaleValue, scaleValue, scaleValue);
         }
       } else if (explosionStep === 2) {
@@ -111,7 +111,7 @@ export class BombermanPlayerBomb {
     setTimeout(() => {
       explosionStep = 2;
       exploded = true;
-    }, playerStats.bombTimeout);
+    }, cachedBombTimeout);
   }
 
   createFireFlares(model: Mesh, maxX1: number, maxX2: number, maxY1: number, maxY2: number, callback: Function) {
@@ -139,7 +139,7 @@ export class BombermanPlayerBomb {
       model,
       {
         start: new BABYLON.Vector3(0, 0, -0.2),
-        end: new BABYLON.Vector3(maxX1, 0, 0.2),
+        end: new BABYLON.Vector3(maxX1 - 0.5, 0, 0.2),
       },
       {
         direction1: new BABYLON.Vector3(1, 0, 0),
@@ -155,7 +155,7 @@ export class BombermanPlayerBomb {
       model,
       {
         start: new BABYLON.Vector3(0, 0, -0.2),
-        end: new BABYLON.Vector3(-maxX2, 0, 0.2),
+        end: new BABYLON.Vector3(-maxX2 + 0.5, 0, 0.2),
       },
       {
         direction1: new BABYLON.Vector3(-1, 0, 0),
@@ -171,7 +171,7 @@ export class BombermanPlayerBomb {
       model,
       {
         start: new BABYLON.Vector3(-0.2, 0, 0),
-        end: new BABYLON.Vector3(0.2, 0, maxY1),
+        end: new BABYLON.Vector3(0.2, 0, maxY1 - 0.5),
       },
       {
         direction1: new BABYLON.Vector3(0, 0, 1),
@@ -187,7 +187,7 @@ export class BombermanPlayerBomb {
       model,
       {
         start: new BABYLON.Vector3(-0.2, 0, 0),
-        end: new BABYLON.Vector3(0.2, 0, -maxY2),
+        end: new BABYLON.Vector3(0.2, 0, -maxY2 + 0.5),
       },
       {
         direction1: new BABYLON.Vector3(0, 0, -1),

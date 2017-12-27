@@ -5,9 +5,12 @@ import { BaseModel, Cube, Ground } from '../shared/engine/object';
 
 import { BombermanGameMap } from './gameMap';
 
-import { EPlayerCharacterType, BombermanPlayerStats, IBombermanPlayerModel, BombermanGameTheme, IBombermanGameSize } from './model';
+import {
+  EPlayerCharacterType, BombermanPlayerStats, IBombermanPlayerModel, BombermanGameTheme, IBombermanGameSize,
+  EBombermanWallType
+} from './model';
 import { IBombermanGraphicsOptions } from './model/options';
-import { BombermanPlayer, DestructibleWall, EBombermanWallType } from './object';
+import { BombermanPlayer, DestructibleWall, IndestructibleWall } from './object';
 
 
 export class GameBuilder {
@@ -15,8 +18,8 @@ export class GameBuilder {
   private _gameGraphicsOptions: IBombermanGraphicsOptions
   private _ground: Ground;
   private _borderWall: Cube[] = [];
-  private _indestructibleWalls: Cube[] = [];
-  private _destructibleWalls: BaseModel[] = [];
+  private _indestructibleWalls: IndestructibleWall[] = [];
+  private _destructibleWalls: DestructibleWall[] = [];
 
 
   private _curretPlayerStats: BombermanPlayerStats;
@@ -54,7 +57,7 @@ export class GameBuilder {
   }
   public findDestructibleWallType(): EBombermanWallType {
     const wallType = this._gameTheme.wallTypes.destructibleWalls[
-      Math.floor(Math.random() * this._gameTheme.wallTextures.destructibleWalls.length)
+      Math.floor(Math.random() * this._gameTheme.wallTypes.destructibleWalls.length)
     ];
     if (wallType === 'cube') {
       return EBombermanWallType.cube;
@@ -72,6 +75,22 @@ export class GameBuilder {
     return this._gameTheme.wallTextures.indestructibleWalls[
       Math.floor(Math.random() * this._gameTheme.wallTextures.indestructibleWalls.length)
     ];
+  }
+
+  public findIndestructibleWallType(): EBombermanWallType {
+    const wallType = this._gameTheme.wallTypes.indestructibleWalls[
+      Math.floor(Math.random() * this._gameTheme.wallTypes.indestructibleWalls.length)
+    ];
+    if (wallType === 'cube') {
+      return EBombermanWallType.cube;
+    } else if (wallType === 'small-cube') {
+      return EBombermanWallType.smallCube;
+    } else if (wallType === 'cylinder') {
+      return EBombermanWallType.cylinder;
+    } else if (wallType === 'sphere') {
+      return EBombermanWallType.sphere;
+    }
+    return EBombermanWallType.cube;
   }
 
   public findNewReward() {
@@ -140,14 +159,12 @@ export class GameBuilder {
 
   private generateIndestructibleWalls() {
     const cubeTexture = this.findIndestructibleTexture();
+    const wallType = this.findIndestructibleWallType()
     this._gameTheme.indestructibleWallPlacementAlgorithm(this._gameMap).forEach(position => {
-      const cube = new Cube(
-        this._gameRenderer,
+      const cube = new IndestructibleWall(
+        this,
         new Vector3(position[0] - 0.5, this._wallHeight / 2, position[1] - 0.5),
-        1, this._wallHeight, 1, false, {
-          shadowEnabled: this.getGameGraphicsOptions().indestructibleWallShadowEnabled,
-          shadowQuality: this.getGameGraphicsOptions().indestructibleWallShadowQuality
-        }
+        wallType
       );
       cube.setTextureFromGallery(cubeTexture);
       this._indestructibleWalls.push(cube);
@@ -194,7 +211,23 @@ export class GameBuilder {
   }
 
   flareDestroy(x: number, y: number, directions) {
-
+    const cells = this._gameMap.getFlareAffectedCells(x, y, directions);
+    cells.forEach(cell => {
+      if (cell.contents.type === 'destructible-wall') {
+        if (this._gameMap.removeDestructibleWall(cell.x, cell.y)) {
+          const index = this._destructibleWalls.indexOf(cell.contents.object);
+          if (index > -1) {
+            this._destructibleWalls.splice(index, 1);
+            (cell.contents.object as DestructibleWall).killWall(() => {
+              cell.contents.object.destroy();
+            });
+          }
+        } else {
+          // TODO: maybe a bug hapens sometimes. But it doesn't!
+        }
+      }
+    })
+    console.log(cells);
   }
 
   getGameGraphicsOptions(): IBombermanGraphicsOptions {

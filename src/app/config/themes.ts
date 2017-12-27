@@ -21,10 +21,10 @@ export const themesData = [
         'cube'
       ],
       indestructibleWalls: [
-        'cube'
+        'cube', 'small-cube', 'cylinder', 'sphere'
       ],
       destructibleWalls: [
-        'cube', 'small-cube'
+        'cube', 'small-cube', 'cylinder', 'sphere'
       ]
     },
     avilableCharacters: [
