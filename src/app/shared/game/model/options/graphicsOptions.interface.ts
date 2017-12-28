@@ -1,4 +1,4 @@
-import { ERendererShadowQuality } from '../../../shared/engine';
+import { ERendererShadowQuality } from '../../../engine';
 
 export interface IBombermanGraphicsOptions {
   worldShadowEnabled: boolean;

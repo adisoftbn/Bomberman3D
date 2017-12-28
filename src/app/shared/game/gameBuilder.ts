@@ -1,7 +1,7 @@
 import { Vector3 } from 'babylonjs';
 
-import { GameRenderer } from '../shared/engine';
-import { BaseModel, Cube, Ground } from '../shared/engine/object';
+import { GameRenderer } from '../engine';
+import { BaseModel, Cube, Ground } from '../engine/object';
 
 import { BombermanGameMap } from './gameMap';
 

@@ -4,7 +4,7 @@ import { IBombermanPlayer } from './player.interface';
 import { BombermanPlayerBomb } from './playerBomb';
 import { GameBuilder } from '../';
 
-import { Character } from '../../shared/engine/object';
+import { Character } from '../../engine/object';
 import { BombermanPlayerStats, EPlayerCharacterType, IBombermanPlayerModel } from '../model';
 
 export class BombermanPlayer implements IBombermanPlayer {

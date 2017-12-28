@@ -1,6 +1,6 @@
 import { Vector3, MeshBuilder, Mesh, ParticleSystem } from 'babylonjs';
 
-import { Sphere, Torus, ParticleEmitter } from '../../shared/engine/object';
+import { Sphere, Torus, ParticleEmitter } from '../../engine/object';
 
 import { GameBuilder } from '../';
 import { IBombermanPlayerStats } from '../model';

@@ -1,4 +1,4 @@
-import { ERendererShadowQuality } from '../../../shared/engine';
+import { ERendererShadowQuality } from '../../../engine';
 import { IBombermanGraphicsOptions } from './graphicsOptions.interface';
 
 export class BombermanMediumGraphicsOptions implements IBombermanGraphicsOptions {

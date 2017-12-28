@@ -1,7 +1,7 @@
 import { Vector3, StandardMaterial, MeshBuilder, Mesh, Vector4, Texture } from 'babylonjs';
 
-import { GameRenderer, IRendererGraphicOptions, RendererGraphicOptions, ERendererShadowQuality } from '../../shared/engine';
-import { BaseModel } from '../../shared/engine/object';
+import { GameRenderer, IRendererGraphicOptions, RendererGraphicOptions, ERendererShadowQuality } from '../../engine';
+import { BaseModel } from '../../engine/object';
 import { EBombermanWallType } from '../model';
 
 import { GameBuilder } from '../';

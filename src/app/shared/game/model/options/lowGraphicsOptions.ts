@@ -1,17 +1,17 @@
-import { ERendererShadowQuality } from '../../../shared/engine';
+import { ERendererShadowQuality } from '../../../engine';
 import { IBombermanGraphicsOptions } from './graphicsOptions.interface';
 
-export class BombermanVeryLowGraphicsOptions implements IBombermanGraphicsOptions {
-  worldShadowEnabled = false;
+export class BombermanLowGraphicsOptions implements IBombermanGraphicsOptions {
+  worldShadowEnabled = true;
   worldShadowQuality = ERendererShadowQuality.low;
-  borderWallShadowEnabled = false;
+  borderWallShadowEnabled = true;
   borderWallShadowQuality = ERendererShadowQuality.low;
   indestructibleWallShadowEnabled = false;
   indestructibleWallShadowQuality = ERendererShadowQuality.low;
   destructibleWallShadowEnabled = false;
   destructibleWallShadowQuality = ERendererShadowQuality.low;
-  charactersShadowEnabled = false;
+  charactersShadowEnabled = true;
   charactersShadowQuality = ERendererShadowQuality.low;
-  temporaryItemsShadowEnabled = false;
+  temporaryItemsShadowEnabled = true;
   temporaryItemsShadowQuality = ERendererShadowQuality.low;
 }

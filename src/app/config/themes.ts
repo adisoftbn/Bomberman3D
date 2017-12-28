@@ -1,4 +1,4 @@
-import { DefaultAlgs } from '../game/defaultAlgorithms';
+import { DefaultAlgs } from '../shared/game/defaultAlgorithms';
 
 export const themesData = [
   {
