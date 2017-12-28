@@ -16,7 +16,7 @@ export class BombermanGameMap {
     return this._height;
   }
 
-  fixPosition(x: number, y: number) {
+  public fixPosition(x: number, y: number) {
     return {
       cellX: Math.ceil(x),
       cellY: Math.ceil(y),
@@ -83,12 +83,38 @@ export class BombermanGameMap {
     }
   }
 
+  findBetterPlayerPosition(position: number[]): number[] {
+    const radius = 2;
+    const positions = [];
+    let foundPosition = position;
+    for (let i = position[0] - radius; i < position[0] + radius; i++) {
+      for (let j = position[1] - radius; j < position[1] + radius; j++) {
+        if (i >= 1 && i <= this._width && j >= 1 && j <= this._height && !this._map[i][j]) {
+          positions.push([i, j]);
+        }
+      }
+    }
+    if (positions.length > 0) {
+      this.shuffle(positions);
+      foundPosition = positions[Math.floor(Math.random() * positions.length)];
+    }
+    return foundPosition;
+  }
+
   public addBomb(x: number, y: number) {
     if (!this._map[x][y]) {
       this._map[x][y] = {
         type: 'bomb',
       };
       this.bombsCache++;
+      return true;
+    }
+    return false;
+  }
+
+  public setBomb(x: number, y: number, object) {
+    if (this._map[x][y] && this._map[x][y].type === 'bomb') {
+      this._map[x][y].object = object;
       return true;
     }
     return false;
@@ -178,53 +204,99 @@ export class BombermanGameMap {
     }
     return result;
   }
+
   getFlareAffectedCells(x: number, y: number, directions) {
-    const result = [];
+    const result = {
+      emptyByHash: {
+      },
+      walls: []
+    };
+    result.emptyByHash['cell_' + x + '_' + y] = true;
     for (let i = 1; i <= directions.x1; i++) {
       if (x + i <= this._width) {
         if (this._map[x + i][y]) {
-          result.push({
+          result.walls.push({
             x: x + i,
             y: y,
             contents: this._map[x + i][y]
           });
+        } else {
+          /* result.empty.push({
+            x: x + i,
+            y: y,
+            contents: null
+          });*/
+          result.emptyByHash['cell_' + (x + i) + '_' + y] = true;
         }
       }
     }
     for (let i = 1; i <= directions.x2; i++) {
       if (x - i >= 1) {
         if (this._map[x - i][y]) {
-          result.push({
+          result.walls.push({
             x: x - i,
             y: y,
             contents: this._map[x - i][y]
           });
+        } else {
+          /* result.empty.push({
+            x: x - i,
+            y: y,
+            contents: null
+          });*/
+          result.emptyByHash['cell_' + (x + i) + '_' + y] = true;
         }
       }
     }
     for (let j = 1; j <= directions.y1; j++) {
       if (y + j <= this._height) {
         if (this._map[x][y + j]) {
-          result.push({
+          result.walls.push({
             x: x,
             y: y + j,
             contents: this._map[x][y + j]
           });
+        } else {
+          /* result.empty.push({
+            x: x,
+            y: y + j,
+            contents: null
+          });*/
+          result.emptyByHash['cell_' + x + '_' + (y + j)] = true;
         }
       }
     }
     for (let j = 1; j <= directions.y2; j++) {
       if (y - j >= 1) {
         if (this._map[x][y - j]) {
-          result.push({
+          result.walls.push({
             x: x,
             y: y - j,
             contents: this._map[x][y - j]
           });
+        } else {
+          /* result.empty.push({
+            x: x,
+            y: y - j,
+            contents: null
+          });*/
+          result.emptyByHash['cell_' + x + '_' + (y - j)] = true;
         }
       }
     }
     return result;
+  }
+
+  shuffle(array) {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+    while (0 !== currentIndex) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+    return array;
   }
 
 }

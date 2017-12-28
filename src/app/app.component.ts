@@ -3,72 +3,99 @@ import { Component, AfterViewInit } from '@angular/core';
 import { texturesUrl, charactersData, themesData } from './config';
 import { GameRenderer } from './shared/engine';
 
-import { EPlayerCharacterType } from './game/model';
+import { EPlayerCharacterType, IBombermanGameRules, BombermanGameRules } from './game/model';
 import {
   IBombermanGraphicsOptions, BombermanVeryLowGraphicsOptions, BombermanLowGraphicsOptions,
   BombermanMediumGraphicsOptions, BombermanHighGraphicsOptions
-} from '../app/game/model/options';
-import { GameBuilder, GameThemes } from './game';
+} from './game/model/options';
+import { GameBuilder, GameThemes, EGameBuilderEventType } from './game';
 
 import { environment } from '../environments/environment';
 
-
+import { gameMemoryStorage } from './shared/gameMemoryStorage';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements AfterViewInit {
-  private _gameRenderer: GameRenderer;
   private _gameBuilder: GameBuilder;
   private _gameThemes: GameThemes;
-
-  private _graphicsOptions: IBombermanGraphicsOptions;
+  private _gameRules: IBombermanGameRules;
 
   constructor() {
     if (environment.graphicsOptions === 'low') {
-      this._graphicsOptions = new BombermanLowGraphicsOptions();
+      gameMemoryStorage.graphicsOptions = new BombermanLowGraphicsOptions();
     } else if (environment.graphicsOptions === 'medium') {
-      this._graphicsOptions = new BombermanMediumGraphicsOptions();
+      gameMemoryStorage.graphicsOptions = new BombermanMediumGraphicsOptions();
     } else if (environment.graphicsOptions === 'high') {
-      this._graphicsOptions = new BombermanHighGraphicsOptions();
+      gameMemoryStorage.graphicsOptions = new BombermanHighGraphicsOptions();
     } else {
-      this._graphicsOptions = new BombermanVeryLowGraphicsOptions();
+      gameMemoryStorage.graphicsOptions = new BombermanVeryLowGraphicsOptions();
     }
   }
 
   ngAfterViewInit() {
-    this._gameRenderer = new GameRenderer('renderCanvas', {
-      shadowEnabled: this._graphicsOptions.worldShadowEnabled,
-      shadowQuality: this._graphicsOptions.worldShadowQuality
+    gameMemoryStorage.gameRenderer = new GameRenderer('renderCanvas', {
+      shadowEnabled: gameMemoryStorage.graphicsOptions.worldShadowEnabled,
+      shadowQuality: gameMemoryStorage.graphicsOptions.worldShadowQuality
     });
-    this._gameRenderer.getTextureGallery().initTextureObjects(texturesUrl);
-    this._gameRenderer.getCharacterGallery().initCharacterObjects(charactersData);
-    this._gameBuilder = new GameBuilder(this._gameRenderer, this._graphicsOptions);
+    gameMemoryStorage.gameRenderer.animate();
+    gameMemoryStorage.gameRenderer.createScene();
+
+    gameMemoryStorage.gameRenderer.getTextureGallery().initTextureObjects(texturesUrl);
+    gameMemoryStorage.gameRenderer.getCharacterGallery().initCharacterObjects(charactersData);
+
+
+
+    this._gameBuilder = new GameBuilder(gameMemoryStorage.gameRenderer, gameMemoryStorage.graphicsOptions,
+      (eventType: EGameBuilderEventType, data: any) => {
+        if (eventType === EGameBuilderEventType.currentPlayerKilled) {
+          alert('You died!');
+        }
+      }
+    );
     this._gameThemes = new GameThemes();
     this._gameThemes.initGameThemes(themesData);
-    this._gameRenderer.animate();
-    this._gameRenderer.createScene();
+
+    this._gameRules = new BombermanGameRules()
+
+
+
+
     this._gameBuilder.buildBombermanGame(
       [
         {
           name: 'Unknown player',
           playerType: EPlayerCharacterType.current,
           characterName: 'Unknown',
-          characterModel: 'rabbit'
+          characterModel: 'archer'
         },
         {
           name: 'Unknown player',
           playerType: EPlayerCharacterType.computerEasy,
           characterName: 'Unknown',
-          characterModel: 'dude'
+          characterModel: 'diablous'
+        },
+        {
+          name: 'Unknown player',
+          playerType: EPlayerCharacterType.computerEasy,
+          characterName: 'Unknown',
+          characterModel: 'female-mage'
+        },
+        {
+          name: 'Unknown player',
+          playerType: EPlayerCharacterType.computerEasy,
+          characterName: 'Unknown',
+          characterModel: 'rabbit'
         }
       ],
       this._gameThemes.getThemeByName('theme1'),
       {
         width: 11,
         height: 10
-      }
+      },
+      this._gameRules
     );
     // this._gameRenderer.getScene().debugLayer.show();
   }

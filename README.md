@@ -33,4 +33,10 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Assets copyright
 Textures from [WildTextures](http://www.wildtextures.com)
+
 Sample 3D objects from [BabylonJs Website](http://babylonjs.com)
+
+
+
+Animated Female Mage made by [Clement Wu, Nikolaus & Botanic](https://opengameart.org/content/animated-female-mage)
+Animated Diablous made by [Clement Wu, Nikolaus & Botanic](https://opengameart.org/content/animated-diablous)

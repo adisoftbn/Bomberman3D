@@ -5,9 +5,19 @@ import { Sphere, Torus, ParticleEmitter } from '../../shared/engine/object';
 import { GameBuilder } from '../';
 import { IBombermanPlayerStats } from '../model';
 
+export enum EPlayerBombStage {
+  initialTimeElapse = 'step1',
+  explosionStarting = 'step2',
+  explosionFlaresEnding = 'step3',
+  explosionFlaresClear = 'step4',
+  explosionEnding = 'step5',
+  explosionDone = 'step6',
+  cleanUp = 'step7'
+}
 
 export class BombermanPlayerBomb {
   private _gameBuilder: GameBuilder;
+  private _forcedKill = false;
   constructor(gameBuilder: GameBuilder, playerStats: IBombermanPlayerStats, position: Vector3,
     scanMapCallback: Function, doneCallback: Function
   ) {
@@ -68,25 +78,32 @@ export class BombermanPlayerBomb {
     sphere.setTextureFromGallery(this._gameBuilder.getGameTheme().bombTexture1);
     torus.setTextureFromGallery(this._gameBuilder.getGameTheme().bombTexture2);
     let exploded = false;
-    let explosionStep = 1;
+    let explosionStage: EPlayerBombStage = EPlayerBombStage.initialTimeElapse;
     let flares = {};
+    let bombTimeout = null;
     sphereModel.registerBeforeRender((mesh) => {
-      if (explosionStep === 1) {
+      if (this._forcedKill && explosionStage === EPlayerBombStage.initialTimeElapse) {
+        this._forcedKill = false;
+        clearTimeout(bombTimeout);
+        explosionStage = EPlayerBombStage.explosionStarting;
+      }
+      if (explosionStage === EPlayerBombStage.initialTimeElapse) {
         if (!exploded) {
           const elapsedTime = performance.now() - startTime;
           const scaleValue = (Math.sin((elapsedTime / cachedBombTimeout) * 10 * Math.PI) + 1) / 4 + 0.9;
           mesh.scaling.set(scaleValue, scaleValue, scaleValue);
         }
-      } else if (explosionStep === 2) {
-        explosionStep = 3;
+      } else if (explosionStage === EPlayerBombStage.explosionStarting) {
+        explosionStage = EPlayerBombStage.explosionFlaresEnding;
         sphereModel.scaling.set(1, 1, 1);
         particles.stop();
         const result = scanMapCallback(cachedBombPower);
-        flares = this.createFireFlares(sphereModel, result.x1, result.x2, result.y1, result.y2, () => {
-          explosionStep = 4;
-        });
-      } else if (explosionStep === 4) {
-        explosionStep = 5;
+        flares = this.createFireFlares(sphereModel, result.x1, result.x2, result.y1, result.y2);
+        setTimeout(() => {
+          explosionStage = EPlayerBombStage.explosionFlaresClear;
+        }, 300);
+      } else if (explosionStage === EPlayerBombStage.explosionFlaresClear) {
+        explosionStage = EPlayerBombStage.explosionEnding;
         (flares as any).maxX1Particles.stop();
         (flares as any).maxX2Particles.stop();
         (flares as any).maxY1Particles.stop();
@@ -95,10 +112,10 @@ export class BombermanPlayerBomb {
         torusModel.material.alpha = 0;
         particles.destroy();
         setTimeout(() => {
-          explosionStep = 6;
+          explosionStage = EPlayerBombStage.explosionDone;
         }, 300);
-      } else if (explosionStep === 6) {
-        explosionStep = 7;
+      } else if (explosionStage === EPlayerBombStage.explosionDone) {
+        explosionStage = EPlayerBombStage.cleanUp;
         (flares as any).maxX1Particles.destroy();
         (flares as any).maxX2Particles.destroy();
         (flares as any).maxY1Particles.destroy();
@@ -108,13 +125,13 @@ export class BombermanPlayerBomb {
       }
     });
 
-    setTimeout(() => {
-      explosionStep = 2;
+    bombTimeout = setTimeout(() => {
+      explosionStage = EPlayerBombStage.explosionStarting;
       exploded = true;
     }, cachedBombTimeout);
   }
 
-  createFireFlares(model: Mesh, maxX1: number, maxX2: number, maxY1: number, maxY2: number, callback: Function) {
+  createFireFlares(model: Mesh, maxX1: number, maxX2: number, maxY1: number, maxY2: number) {
     const particleOptions = {
       minSize: 1,
       maxSize: 3,
@@ -197,9 +214,6 @@ export class BombermanPlayerBomb {
       particleOptions
     );
     maxY2Particles.setTextureFromGallery(this._gameBuilder.getGameTheme().fireParticlesTexture);
-    setTimeout(() => {
-      callback();
-    }, 300);
 
     return {
       maxX1Particles,
@@ -207,6 +221,9 @@ export class BombermanPlayerBomb {
       maxY1Particles,
       maxY2Particles
     }
+  }
+  public forceKill() {
+    this._forcedKill = true;
   }
 }
 

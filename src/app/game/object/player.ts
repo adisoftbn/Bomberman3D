@@ -82,6 +82,7 @@ export class BombermanPlayer implements IBombermanPlayer {
           }
         }
       );
+      this._gameBuilder.getGameMap().setBomb(fixedPosition.cellX, fixedPosition.cellY, bomb);
     } else {
       // TODO: if cell not empty?
     }

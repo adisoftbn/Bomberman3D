@@ -12,8 +12,8 @@ export interface IBombermanGameWallTypes {
   destructibleWalls: string[];
 }
 
-export type BombermanGameMapFunction = (gameMap: BombermanGameMap) => any[];
-export type BombermanGameMapPlayersFunction = (gameMap: BombermanGameMap, playersCount: number) => any[];
+export type TBombermanGameMapFunction = (gameMap: BombermanGameMap) => any[];
+export type TBombermanGameMapPlayersFunction = (gameMap: BombermanGameMap, playersCount: number) => any[];
 
 export interface IBombermanGameTheme {
   name: string;
@@ -30,7 +30,7 @@ export interface IBombermanGameTheme {
   fireColor3: number[];
   fireParticlesTexture: string;
   backgroundColor: number[];
-  indestructibleWallPlacementAlgorithm?: BombermanGameMapFunction;
-  destructibleWallPlacementAlgorithm?: BombermanGameMapFunction;
-  playerPlacementAlgorithm?: BombermanGameMapPlayersFunction;
+  indestructibleWallPlacementAlgorithm?: TBombermanGameMapFunction;
+  destructibleWallPlacementAlgorithm?: TBombermanGameMapFunction;
+  playerPlacementAlgorithm?: TBombermanGameMapPlayersFunction;
 }

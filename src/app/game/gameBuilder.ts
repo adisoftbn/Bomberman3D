@@ -7,10 +7,18 @@ import { BombermanGameMap } from './gameMap';
 
 import {
   EPlayerCharacterType, BombermanPlayerStats, IBombermanPlayerModel, BombermanGameTheme, IBombermanGameSize,
-  EBombermanWallType
+  EBombermanWallType, IBombermanGameRules, BombermanGameRules
 } from './model';
+
 import { IBombermanGraphicsOptions } from './model/options';
-import { BombermanPlayer, DestructibleWall, IndestructibleWall } from './object';
+import { BombermanPlayer, DestructibleWall, IndestructibleWall, BombermanPlayerBomb } from './object';
+
+export enum EGameBuilderEventType {
+  currentPlayerKilled = 1,
+  playerKilled = 2,
+  reward = 3
+}
+export type TGameBuilderCallback = (eventType: EGameBuilderEventType, data?: any) => void;
 
 
 export class GameBuilder {
@@ -28,6 +36,7 @@ export class GameBuilder {
 
   private _gameMap: BombermanGameMap;
   private _gameTheme: BombermanGameTheme;
+  private _gameRules: IBombermanGameRules;
 
 
   protected _wallHeight = 0.7;
@@ -37,13 +46,22 @@ export class GameBuilder {
   protected _rewardMaxPosibilites = 10;
   protected _rewardChance = 6;
 
+  protected _gameBuilderEventCallback: TGameBuilderCallback = null;
 
-  constructor(gameRenderer: GameRenderer, gameGraphicsOptions: IBombermanGraphicsOptions) {
+
+  constructor(gameRenderer: GameRenderer, gameGraphicsOptions: IBombermanGraphicsOptions,
+    gameBuilderEventCallback: TGameBuilderCallback = null) {
     this._gameRenderer = gameRenderer;
     this._gameGraphicsOptions = gameGraphicsOptions;
+    this._gameBuilderEventCallback = gameBuilderEventCallback;
     this._gameMap = new BombermanGameMap();
   }
 
+  protected proceedGameBuilderCallback(eventType: EGameBuilderEventType, data: any = null) {
+    if (this._gameBuilderEventCallback) {
+      this._gameBuilderEventCallback(eventType, data);
+    }
+  }
   public findGroundTexture(): string {
     return this._gameTheme.groundTextures[
       Math.floor(Math.random() * this._gameTheme.groundTextures.length)
@@ -97,8 +115,11 @@ export class GameBuilder {
 
   }
 
-  public buildBombermanGame(players: IBombermanPlayerModel[], gameTheme: BombermanGameTheme, size: IBombermanGameSize) {
+  public buildBombermanGame(players: IBombermanPlayerModel[], gameTheme: BombermanGameTheme, size: IBombermanGameSize,
+    gameRules: IBombermanGameRules
+  ) {
     this._gameTheme = gameTheme;
+    this._gameRules = gameRules;
     this._gameMap.createMap(size.width, size.height);
     this._ground = new Ground(
       this._gameRenderer,
@@ -198,7 +219,7 @@ export class GameBuilder {
     let index = 0;
     players.forEach(character => {
       index++;
-      const currentPosition = positions[index];
+      const currentPosition = this._gameMap.findBetterPlayerPosition(positions[index - 1]);
       if (character.playerType === EPlayerCharacterType.current) {
         this._gameMap.addPlayerPosition(currentPosition[0], currentPosition[1]);
         this._currentPlayer = new BombermanPlayer(this, character, currentPosition, true)
@@ -210,9 +231,38 @@ export class GameBuilder {
     });
   }
 
-  flareDestroy(x: number, y: number, directions) {
+  public flareDestroy(x: number, y: number, directions) {
     const cells = this._gameMap.getFlareAffectedCells(x, y, directions);
-    cells.forEach(cell => {
+    const playerPositions = [];
+    if (!this._currentPlayer.character.isCharacterKilled()) {
+      const rawPosition = this._currentPlayer.character.getPosition();
+      const newPosition = this._gameMap.fixPosition(rawPosition.x, rawPosition.z);
+      if (cells.emptyByHash['cell_' + newPosition.cellX + '_' + newPosition.cellY]) {
+        if (!this._currentPlayer.character.isCharacterKilled()) {
+          this.proceedGameBuilderCallback(EGameBuilderEventType.currentPlayerKilled);
+          this._currentPlayer.character.killCharacter(() => {
+            // TODO: Event when player killed
+          });
+        }
+      }
+    }
+    this._players.forEach(player => {
+      if (!player.character.isCharacterKilled()) {
+        const rawPosition = player.character.getPosition();
+        const newPosition = this._gameMap.fixPosition(rawPosition.x, rawPosition.z);
+        if (cells.emptyByHash['cell_' + newPosition.cellX + '_' + newPosition.cellY]) {
+          if (!player.character.isCharacterKilled()) {
+            this.proceedGameBuilderCallback(EGameBuilderEventType.playerKilled);
+            player.character.killCharacter(() => {
+              // TODO: Event when player killed
+            });
+          }
+        }
+        }
+    });
+
+
+    cells.walls.forEach(cell => {
       if (cell.contents.type === 'destructible-wall') {
         if (this._gameMap.removeDestructibleWall(cell.x, cell.y)) {
           const index = this._destructibleWalls.indexOf(cell.contents.object);
@@ -225,24 +275,44 @@ export class GameBuilder {
         } else {
           // TODO: maybe a bug hapens sometimes. But it doesn't!
         }
+      } else if (cell.contents.type === 'bomb') {
+        if (this._gameRules.bombCascadeDestroy) {
+          (cell.contents.object as BombermanPlayerBomb).forceKill();
+        }
+        // } else if (cell.contents.type === 'indestructible-wall') {
+        /* if (this._gameRules.bombCascadeDestroy) {
+          (cell.contents.object as BombermanPlayerBomb).forceKill();
+        }*/
       }
-    })
-    console.log(cells);
+      /*      playerPositions.forEach(player => {
+              console.log(cell.x + ' ' + player.position[0] + ' ' + cell.y + ' ' + player.position[1] + ' ' + player.type);
+              if (cell.x === player.position[0] && cell.y === player.position[1]) {
+                if (!player.character.killed) {
+                  if (player.type === 'current') {
+                    this.proceedGameBuilderCallback(EGameBuilderEventType.currentPlayerKilled);
+                  }
+                  player.character.killCharacter(() => {
+                    // TODO: Event when player killed
+                  });
+                }
+              }
+            });*/
+    });
   }
 
-  getGameGraphicsOptions(): IBombermanGraphicsOptions {
+  public getGameGraphicsOptions(): IBombermanGraphicsOptions {
     return this._gameGraphicsOptions;
   }
 
-  getGameRenderer(): GameRenderer {
+  public getGameRenderer(): GameRenderer {
     return this._gameRenderer;
   }
 
-  getGameTheme(): BombermanGameTheme {
+  public getGameTheme(): BombermanGameTheme {
     return this._gameTheme;
   }
 
-  getGameMap(): BombermanGameMap {
+  public getGameMap(): BombermanGameMap {
     return this._gameMap;
   }
 }

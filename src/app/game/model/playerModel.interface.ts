@@ -1,9 +1,9 @@
 export enum EPlayerCharacterType {
-  current = 'CURRENT',
-  network = 'NETWORK',
-  computerEasy = 'COMPUTER_EASY',
-  computerMedium = 'COMPUTER_MEDIUM',
-  computerHard = 'COMPUTER_HARD'
+  current = 'current',
+  network = 'network',
+  computerEasy = 'computerEasy',
+  computerMedium = 'computerMedium',
+  computerHard = 'computerHard'
 }
 
 export interface IBombermanPlayerModel {
