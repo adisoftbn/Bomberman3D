@@ -114,6 +114,10 @@ export class GameBuilder {
   public findNewReward() {
 
   }
+  setGameTheme(gameTheme: BombermanGameTheme) {
+    this._gameTheme = gameTheme;
+  }
+
 
   public buildBombermanGame(players: IBombermanPlayerModel[], gameTheme: BombermanGameTheme, size: IBombermanGameSize,
     gameRules: IBombermanGameRules
@@ -258,7 +262,7 @@ export class GameBuilder {
             });
           }
         }
-        }
+      }
     });
 
 
