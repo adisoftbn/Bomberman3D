@@ -9,7 +9,7 @@ import { NewGameComponent, SettingsComponent, CreditsComponent } from './mainmen
       { path: 'new-game', component: NewGameComponent },
       { path: 'settings', component: SettingsComponent },
       { path: 'credits', component: CreditsComponent },
-      { path: '**', component: HomeComponent }
+      { path: '', component: HomeComponent }
     ])
   ],
   exports: [RouterModule]

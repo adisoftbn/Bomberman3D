@@ -1,5 +1,8 @@
 import { Component, AfterViewInit } from '@angular/core';
 
+
+import { gameMemoryStorage } from '../shared/gameMemoryStorage';
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -10,5 +13,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+
   }
+
 }

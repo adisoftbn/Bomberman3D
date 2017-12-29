@@ -37,13 +37,14 @@ export class AppComponent implements AfterViewInit {
       shadowQuality: gameMemoryStorage.graphicsOptions.worldShadowQuality
     });
     gameMemoryStorage.gameRenderer.createScene();
-    gameMemoryStorage.gameRenderer.enterMenuMode();
 
     gameMemoryStorage.gameRenderer.getTextureGallery().initTextureObjects(texturesUrl);
     gameMemoryStorage.gameRenderer.getCharacterGallery().initCharacterObjects(charactersData);
     gameMemoryStorage.gameThemes = new GameThemes();
     gameMemoryStorage.gameThemes.initGameThemes(themesData);
-
+    gameMemoryStorage.initGameBuilder();
+    gameMemoryStorage.createMenuBackground();
+    gameMemoryStorage.gameRenderer.enterGameMode();
 
   }
 

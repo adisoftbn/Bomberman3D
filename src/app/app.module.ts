@@ -6,6 +6,7 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MenuModule } from './menu/menu.module';
+import { GameModule } from './game/game.module';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { MenuModule } from './menu/menu.module';
     FormsModule,
     HttpModule,
     AppRoutingModule,
-    MenuModule
+    MenuModule,
+    GameModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -7,6 +7,15 @@ body {
   padding: 0;
 }
 
+body {
+  font-family: 'Open Sans';
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1em;
+  min-width: 320px;
+}
+
 .babylonjs-fps {
   position: absolute;
   right: 10px;
@@ -28,4 +37,30 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(23, 162, 184, 0.2);
+}
+
+.center-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.menu-button-wrapper {
+  padding: 20px;
+  max-width: 240px;
+}
+
+.menu-button {
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 40px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #17a2b8;
+  color: white;
+  padding: 0 20px;
 }
