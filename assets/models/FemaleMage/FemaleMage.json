@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "animations": {
+    "idle": [130, 151],
+    "walk": [161, 186],
+    "run": [161, 186],
+    "moveLeft": [161, 186],
+    "moveRight": [161, 186],
+    "die": [66, 111],
+    "hitReceived": [112, 126],
+    "attack": [1, 65]
+  },
+  "transform": {
+    "scale": [0.5, 0.5, 0.5],
+    "position": [0, 0.45, 0],
+    "rotate": [0, 180, 0]
+  }
+}

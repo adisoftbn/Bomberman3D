@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "animations": {
+    "idle": [151, 172],
+    "idle1": [151, 172],
+    "idle2": [177, 230],
+    "walk": [263, 288],
+    "run": [231, 248],
+    "moveLeft": [263, 288],
+    "moveRight": [263, 288],
+    "hitReceived": [121, 144],
+    "attack": [1, 51]
+  },
+  "transform": {
+    "scale": [0.5, 0.5, 0.5],
+    "position": [0, -0.2, 0],
+    "rotate": [0, 180, 0]
+  }
+}
