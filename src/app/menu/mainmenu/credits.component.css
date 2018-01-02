@@ -1,0 +1,46 @@
+:host {
+  color: white;
+}
+
+.center-credits {
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  user-select: none;
+}
+
+.credits-top {
+  width: 100%;
+  max-width: 720px;
+  padding: 20px;
+  margin: 20px auto;
+}
+
+.credits-list {
+  width: 100%;
+  max-width: 720px;
+  margin: 20px auto;
+  background-color: rgba(23, 162, 184, 0.5);
+  padding: 20px;
+}
+
+.menu-separator-wrapper {
+  padding: 20px 0;
+}
+
+.menu-separator {
+  border-bottom: 1px solid #17a2b8;
+}
+
+h1 {
+  text-align: center;
+  padding: 0 20px 40px;
+}
+
+a {
+  color: white;
+}
+
+.col {
+  padding: 20px;
+}

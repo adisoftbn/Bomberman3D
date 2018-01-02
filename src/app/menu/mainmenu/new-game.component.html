@@ -1,0 +1,151 @@
+<div class="menu-wrapper">
+  <div *ngIf="currentGameType == null" class="center-menu-buttons">
+    <div class="center-menu-buttons-inner">
+      <div class="menu-logo-wrapper">
+        <img class="menu-logo" src="assets/images/logo-bomberman3d.png" />
+      </div>
+      <div class="menu-h1">New game</div>
+      <div class="menu-separator-wrapper">
+        <div class="menu-separator"></div>
+      </div>
+      <div class="menu-button-wrapper">
+        <div class="menu-button" [routerLink]="['/new-game','single']">Single player</div>
+      </div>
+      <div class="menu-button-wrapper">
+        <div class="menu-button disabled" [routerLink]="['/new-game','create']">Create multiplayer</div>
+      </div>
+      <div class="menu-button-wrapper">
+        <div class="menu-button disabled" [routerLink]="['/new-game','join']">Join multiplayer</div>
+      </div>
+      <div class="menu-separator-wrapper">
+        <div class="menu-separator"></div>
+      </div>
+      <div class="menu-button-wrapper">
+        <div class="menu-button cancel" [routerLink]="['/']">Back</div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="currentGameType == 'single'" class="center-menu-buttons">
+    <div class="center-menu-buttons-inner">
+      <div class="menu-logo-wrapper">
+        <img class="menu-logo" src="assets/images/logo-bomberman3d.png" />
+      </div>
+      <div class="menu-h1">New singleplayer game</div>
+      <div class="menu-separator-wrapper">
+        <div class="menu-separator"></div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="dropdown-label">Map size</div>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="mapSizeDropdown" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+              {{mapSize}} Players
+            </button>
+            <div class="dropdown-menu" aria-labelledby="mapSizeDropdown">
+              <a class="dropdown-item" href="javascript:void(0)" (click)="switchToMapSize(2)">2 Players</a>
+              <a class="dropdown-item" href="javascript:void(0)" (click)="switchToMapSize(3)">3 Players</a>
+              <a class="dropdown-item" href="javascript:void(0)" (click)="switchToMapSize(4)">4 Players</a>
+              <a class="dropdown-item" href="javascript:void(0)" (click)="switchToMapSize(6)">6 Players</a>
+              <a class="dropdown-item" href="javascript:void(0)" (click)="switchToMapSize(8)">8 Players</a>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="dropdown-label">Map theme</div>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="mapSizeDropdown" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+              {{currentTheme.label}}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="mapSizeDropdown">
+              <a *ngFor="let theme of themes" class="dropdown-item" href="javascript:void(0)" (click)="switchToTheme(theme)">{{theme.label}}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="menu-h2">Players</div>
+      <div class="map-players">
+        <div *ngFor="let playerIndex of playersCount" class="player-item">
+          <div class="row">
+            <div class="col">
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="mapSizeDropdown" data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false">
+                  {{players[playerIndex]?players[playerIndex].playerTypeLabel:'None'}}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="mapSizeDropdown">
+                  <a *ngFor="let playerType of playerTypes" class="dropdown-item" href="javascript:void(0)" (click)="switchPlayerType(playerIndex,playerType)">{{playerType.label}}</a>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="mapSizeDropdown" data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false">
+                  {{players[playerIndex]?players[playerIndex].characterLabel:'None'}}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="mapSizeDropdown">
+                  <a *ngFor="let character of characters" class="dropdown-item" href="javascript:void(0)" (click)="switchPlayerCharacter(playerIndex,character)">{{character.label}}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="menu-separator-wrapper">
+        <div class="menu-separator"></div>
+      </div>
+      <div class="menu-button-wrapper">
+        <div class="row">
+          <div class="col">
+            <div class="menu-button cancel" [routerLink]="['/new-game']">Back</div>
+          </div>
+          <div class="col">
+            <div class="menu-button" [routerLink]="['/game']">Start</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="currentGameType == 'create'" class="center-menu-buttons">
+    <div class="center-menu-buttons-inner">
+      <div class="menu-logo-wrapper">
+        <img class="menu-logo" src="assets/images/logo-bomberman3d.png" />
+      </div>
+      <div class="menu-h1">New multiplayer game</div>
+      <div class="menu-separator-wrapper">
+        <div class="menu-separator"></div>
+      </div>
+      <div class="alert alert-danger" role="alert">
+        <strong>Sorry!</strong> Not implemented yet!
+      </div>
+      <div class="menu-separator-wrapper">
+        <div class="menu-separator"></div>
+      </div>
+      <div class="menu-button-wrapper">
+        <div class="menu-button cancel" [routerLink]="['/new-game']">Back</div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="currentGameType == 'join'" class="center-menu-buttons">
+    <div class="center-menu-buttons-inner">
+      <div class="menu-logo-wrapper">
+        <img class="menu-logo" src="assets/images/logo-bomberman3d.png" />
+      </div>
+      <div class="menu-h1">Join multiplayer game</div>
+      <div class="menu-separator-wrapper">
+        <div class="menu-separator"></div>
+      </div>
+      <div class="alert alert-danger" role="alert">
+        <strong>Sorry!</strong> Not implemented yet!
+      </div>
+      <div class="menu-separator-wrapper">
+        <div class="menu-separator"></div>
+      </div>
+      <div class="menu-button-wrapper">
+        <div class="menu-button cancel" [routerLink]="['/new-game']">Back</div>
+      </div>
+    </div>
+  </div>
+</div>

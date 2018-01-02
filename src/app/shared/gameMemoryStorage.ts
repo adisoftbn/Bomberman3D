@@ -58,7 +58,7 @@ class BombermanGameMemoryStorage {
           name: 'Unknown player',
           playerType: EPlayerCharacterType.current,
           characterName: 'Unknown',
-          characterModel: 'archer'
+          characterModel: 'female-mage'
         },
         {
           name: 'Unknown player',

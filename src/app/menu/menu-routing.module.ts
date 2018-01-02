@@ -6,8 +6,11 @@ import { NewGameComponent, SettingsComponent, CreditsComponent } from './mainmen
 @NgModule({
   imports: [
     RouterModule.forChild([
-      { path: 'new-game', component: NewGameComponent },
-      { path: 'settings', component: SettingsComponent },
+      { path: 'new-game', component: NewGameComponent, pathMatch: 'full' },
+      { path: 'new-game/:gameType', component: NewGameComponent, pathMatch: 'full' },
+      { path: 'new-game/:gameType/:room', component: NewGameComponent, pathMatch: 'full' },
+      { path: 'settings', component: SettingsComponent, pathMatch: 'full' },
+      { path: 'settings/:category', component: SettingsComponent, pathMatch: 'full' },
       { path: 'credits', component: CreditsComponent },
       { path: '', component: HomeComponent }
     ])
