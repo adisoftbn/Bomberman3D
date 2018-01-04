@@ -3,9 +3,8 @@
 }
 
 .center-credits {
-  width: 100vw;
-  height: 100vh;
-  overflow-y: auto;
+  width: 100%;
+  min-height: 100vh;
   user-select: none;
 }
 
