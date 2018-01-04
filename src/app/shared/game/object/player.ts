@@ -9,14 +9,14 @@ import { BombermanPlayerStats, EPlayerCharacterType, IBombermanPlayerModel } fro
 
 export class BombermanPlayer implements IBombermanPlayer {
   private _gameBuilder: GameBuilder;
-  character: Character;
+  _character: Character;
   stats: BombermanPlayerStats;
 
   constructor(gameBuilder: GameBuilder, character: IBombermanPlayerModel, initialPosition: number[], currentPlayer: boolean) {
     this._gameBuilder = gameBuilder;
     this.stats = new BombermanPlayerStats();
     if (currentPlayer) {
-      this.character = new Character(
+      this._character = new Character(
         this._gameBuilder.getGameRenderer(),
         new Vector3(initialPosition[0] - 0.5, 0, initialPosition[1] - 0.5),
         {
@@ -29,7 +29,7 @@ export class BombermanPlayer implements IBombermanPlayer {
               key: 32,
               onlyOnPress: true,
               callback: () => {
-                const position = this.character.getPosition();
+                const position = this._character.getPosition();
                 this.dropBomb(position);
               }
             }
@@ -41,16 +41,16 @@ export class BombermanPlayer implements IBombermanPlayer {
           shadowQuality: this._gameBuilder.getGameGraphicsOptions().charactersShadowQuality
         }
       );
-      this.character.buildFromGallery(character.characterModel, () => {
+      this._character.buildFromGallery(character.characterModel, () => {
         const camera = this._gameBuilder.getGameRenderer().getCamera();
-        camera.parent = this.character.getModelRoot();
+        camera.parent = this._character.getModelRoot();
         camera.position.z = -30;
         camera.rotation.x = Math.PI / 6;
         camera.position.y = 30;
       });
 
     } else {
-      this.character = new Character(
+      this._character = new Character(
         this._gameBuilder.getGameRenderer(),
         new Vector3(initialPosition[0] - 0.5, 0, initialPosition[1] - 0.5),
         null,
@@ -60,12 +60,17 @@ export class BombermanPlayer implements IBombermanPlayer {
           shadowQuality: this._gameBuilder.getGameGraphicsOptions().charactersShadowQuality
         }
       );
-      this.character.buildFromGallery(character.characterModel, () => {
+      this._character.buildFromGallery(character.characterModel, () => {
         // TODO: after character load
       });
 
     }
   }
+
+  getCharacter() {
+    return this._character;
+  }
+
   dropBomb(position) {
     const fixedPosition = this._gameBuilder.getGameMap().fixPosition(position.x, position.z);
     if (this._gameBuilder.getGameMap().addBomb(fixedPosition.cellX, fixedPosition.cellY)) {
@@ -85,6 +90,13 @@ export class BombermanPlayer implements IBombermanPlayer {
       this._gameBuilder.getGameMap().setBomb(fixedPosition.cellX, fixedPosition.cellY, bomb);
     } else {
       // TODO: if cell not empty?
+    }
+  }
+
+  destroy() {
+    if (this._character) {
+      this._character.destroy();
+      this._character = null;
     }
   }
 

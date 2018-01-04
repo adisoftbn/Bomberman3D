@@ -1,132 +1,65 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+
+import { gameMemoryStorage } from '../../shared/gameMemoryStorage';
+import { EPlayerCharacterType } from '../../shared/game/model';
+
+import { charactersData, themesData } from '../../config';
 
 @Component({
   selector: 'app-new-game',
   templateUrl: './new-game.component.html',
   styleUrls: ['./new-game.component.css']
 })
-export class NewGameComponent implements OnInit {
+export class NewGameComponent implements OnInit, AfterViewInit {
   mapSize = 2;
   mapSizes = [2, 3, 4, 6, 8];
   currentGameType = null;
-  gameTypes = [
-    'single',
-    'create',
-    'join',
-  ];
+  gameTypes = ['single', 'create', 'join'];
   currentTheme = null;
-  themes = [
-    {
-      label: 'Greenland',
-      name: 'theme1'
-    },
-    {
-      label: 'Rocky land',
-      name: 'theme-rocky'
-    },
-  ];
-
+  themes = [];
   playerTypes = [
     {
-      label: 'None',
-      type: 'none',
+      title: 'None',
+      type: null,
     },
     {
-      label: 'You',
-      type: 'current',
+      title: 'You',
+      type: EPlayerCharacterType.current,
     },
     {
-      label: 'Computer easy',
-      type: 'computerEasy',
+      title: 'Computer easy',
+      type: EPlayerCharacterType.computerEasy,
     },
     {
-      label: 'Computer medium',
-      type: 'computerMedium',
+      title: 'Computer medium',
+      type: EPlayerCharacterType.computerMedium,
     },
     {
-      label: 'Computer hard',
-      type: 'computerHard',
+      title: 'Computer hard',
+      type: EPlayerCharacterType.computerHard,
     },
   ];
-  playersCount = ['player1', 'player2'];
+  playersCount = [];
 
-  characters = [
-    {
-      label: 'Rabbit',
-      type: 'rabbit',
-    },
-    {
-      label: 'Mage',
-      type: 'mage',
-    },
-    {
-      label: 'Female Mage',
-      type: 'female-mage',
-    },
-    {
-      label: 'Archer',
-      type: 'archer',
-    },
-    {
-      label: 'Diablous',
-      type: 'diablous',
-    },
-  ];
+  characters = [];
 
-  players = {
-    player1: {
-      playerType: 'current',
-      playerTypeLabel: 'You',
-      character: 'rabbit',
-      characterLabel: 'Rabbit'
-    },
-    player2: {
-      playerType: 'computerEasy',
-      playerTypeLabel: 'Computer easy',
-      character: 'mage',
-      characterLabel: 'Mage'
-    },
-    player3: {
-      playerType: 'none',
-      playerTypeLabel: 'None',
-      character: 'female-mage',
-      characterLabel: 'Female Mage'
-    },
-    player4: {
-      playerType: 'none',
-      playerTypeLabel: 'None',
-      character: 'archer',
-      characterLabel: 'Archer'
-    },
-    player5: {
-      playerType: 'none',
-      playerTypeLabel: 'None',
-      character: 'diablous',
-      characterLabel: 'Diablous'
-    },
-    player6: {
-      playerType: 'none',
-      playerTypeLabel: 'None',
-      character: 'rabbit',
-      characterLabel: 'Rabbit'
-    },
-    player7: {
-      playerType: 'none',
-      playerTypeLabel: 'None',
-      character: 'mage',
-      characterLabel: 'Mage'
-    },
-    player8: {
-      playerType: 'none',
-      playerTypeLabel: 'None',
-      character: 'female-mage',
-      characterLabel: 'Female Mage'
-    }
-  };
+  players = null;
 
-  constructor(public route: ActivatedRoute) {
+  constructor(private router: Router, public route: ActivatedRoute) {
+    themesData.forEach(theme => {
+      this.themes.push({
+        title: theme.title,
+        name: theme.name
+      });
+    });
     this.currentTheme = this.themes[0];
+    charactersData.forEach(character => {
+      this.characters.push({
+        title: character.title,
+        name: character.name
+      })
+    });
   }
 
   ngOnInit() {
@@ -137,7 +70,63 @@ export class NewGameComponent implements OnInit {
         if (this.currentGameType !== null && this.gameTypes.indexOf(this.currentGameType) < 0) {
           this.currentGameType = null;
         }
+        if (this.currentGameType === 'single') {
+          this.playersCount = ['player1', 'player2'];
+          this.players = {
+            player1: {
+              playerType: EPlayerCharacterType.current,
+              playerTypeTitle: 'You',
+              character: 'rabbit',
+              characterTitle: 'Rabbit'
+            },
+            player2: {
+              playerType: EPlayerCharacterType.computerEasy,
+              playerTypeTitle: 'Computer easy',
+              character: 'mage',
+              characterTitle: 'Mage'
+            },
+            player3: {
+              playerType: null,
+              playerTypeTitle: 'None',
+              character: 'female-mage',
+              characterTitle: 'Female Mage'
+            },
+            player4: {
+              playerType: null,
+              playerTypeTitle: 'None',
+              character: 'archer',
+              characterTitle: 'Archer'
+            },
+            player5: {
+              playerType: null,
+              playerTypeTitle: 'None',
+              character: 'diablous',
+              characterTitle: 'Diablous'
+            },
+            player6: {
+              playerType: null,
+              playerTypeTitle: 'None',
+              character: 'rabbit',
+              characterTitle: 'Rabbit'
+            },
+            player7: {
+              playerType: null,
+              playerTypeTitle: 'None',
+              character: 'mage',
+              characterTitle: 'Mage'
+            },
+            player8: {
+              playerType: null,
+              playerTypeTitle: 'None',
+              character: 'female-mage',
+              characterTitle: 'Female Mage'
+            }
+          };
+        }
       });
+  }
+  ngAfterViewInit() {
+    gameMemoryStorage.enterMenuMode();
   }
 
   switchToMapSize(newSize) {
@@ -154,12 +143,51 @@ export class NewGameComponent implements OnInit {
     this.currentTheme = theme;
   }
 
-  switchPlayerType(playerType) {
+  removeCurrentPlayer(replaceWith = null) {
+    for (let i = 1; i <= this.mapSize; i++) {
+      if (this.players['player' + i].playerType === EPlayerCharacterType.current) {
+        if (replaceWith) {
+          this.players['player' + i].playerType = replaceWith.playerType;
+          this.players['player' + i].playerTypeTitle = replaceWith.playerTypeTitle;
+        } else {
+          this.players['player' + i].playerType = null;
+          this.players['player' + i].playerTypeTitle = 'None';
+        }
+      }
+    }
+  }
+
+  switchPlayerType(playerIndex, playerType) {
+    if (this.players[playerIndex].playerType !== EPlayerCharacterType.current) {
+      if (playerType.type === EPlayerCharacterType.current) {
+        this.removeCurrentPlayer(this.players[playerIndex]);
+        this.players[playerIndex].playerType = EPlayerCharacterType.current;
+        this.players[playerIndex].playerTypeTitle = 'You';
+      } else {
+        this.players[playerIndex].playerType = playerType.type;
+        this.players[playerIndex].playerTypeTitle = playerType.title;
+      }
+    }
+  }
+
+  switchPlayerCharacter(playerIndex, character) {
 
   }
 
-  switchPlayerCharacter(character) {
-
+  startSinglePlayerGame() {
+    const newPlayers = [];
+    for (let i = 1; i <= this.mapSize; i++) {
+      if (this.players['player' + i].playerType) {
+        newPlayers.push({
+          name: 'Unknown player',
+          playerType: this.players['player' + i].playerType,
+          characterName: this.players['player' + i].characterTitle,
+          characterModel: this.players['player' + i].character
+        });
+      }
+    }
+    gameMemoryStorage.enterGameMode();
+    gameMemoryStorage.buildNewGame(this.mapSize, newPlayers, this.currentTheme.name);
+    this.router.navigateByUrl('/game');
   }
-
 }

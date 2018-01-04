@@ -1,6 +1,8 @@
 export const charactersData = [
   {
     name: 'female-mage',
+    title: 'Female Mage',
+    enabled: true,
     modelPath: 'assets/models/FemaleMage/',
     modelFileName: 'FemaleMage.babylon',
     modelFileType: 'babylon',
@@ -21,20 +23,21 @@ export const charactersData = [
     }
   },
   {
-    name: 'diablous',
-    modelPath: 'assets/models/Diablous/',
-    modelFileName: 'Diablous.babylon',
+    name: 'mage',
+    title: 'Mage',
+    enabled: true,
+    modelPath: 'assets/models/Mage/',
+    modelFileName: 'Mage.babylon',
     modelFileType: 'babylon',
     animations: {
-      idle: [151, 172],
-      idle2: [177, 230],
-      walk: [263, 288],
-      run: [231, 248],
-      moveLeft: [263, 288], // missing
-      moveRight: [263, 288], // missing
-      die: [67, 112],
-      hitReceived: [121, 144],
-      attack: [1, 51]
+      idle: [71, 96],
+      walk: [101, 126],
+      run: [101, 126],
+      moveLeft: [101, 126], // missing
+      moveRight: [101, 126], // missing
+      die: [18, 41],
+      hitReceived: [51, 63],
+      attack: [1, 15]
     },
     transform: {
       scale: [0.5, 0.5, 0.5],
@@ -43,7 +46,32 @@ export const charactersData = [
     }
   },
   {
+    name: 'rabbit',
+    title: 'Rabbit',
+    enabled: true,
+    modelPath: 'assets/models/Rabbit/',
+    modelFileName: 'Rabbit.babylon',
+    modelFileType: 'babylon',
+    animations: {
+      idle: [0, 30],
+      walk: [31, 54],
+      run: [31, 54],
+      moveLeft: [31, 54], // missing
+      moveRight: [31, 54], // missing
+      die: [70, 100],
+      hitReceived: [0, 30],
+      attack: [0, 30]
+    },
+    transform: {
+      scale: [0.1, 0.1, 0.1],
+      position: [0, -5.2, 0],
+      rotate: [0, 0, 0]
+    }
+  },
+  {
     name: 'archer',
+    title: 'Archer',
+    enabled: true,
     modelPath: 'assets/models/Archer/',
     modelFileName: 'Archer.babylon',
     modelFileType: 'babylon',
@@ -63,28 +91,28 @@ export const charactersData = [
       rotate: [0, 180, 0]
     }
   },
-
-
-
   {
-    name: 'rabbit',
-    modelPath: 'assets/models/Rabbit/',
-    modelFileName: 'Rabbit.babylon',
+    name: 'diablous',
+    title: 'Diablous',
+    enabled: true,
+    modelPath: 'assets/models/Diablous/',
+    modelFileName: 'Diablous.babylon',
     modelFileType: 'babylon',
     animations: {
-      idle: [0, 30],
-      walk: [31, 54],
-      run: [31, 54],
-      moveLeft: [31, 54], // missing
-      moveRight: [31, 54], // missing
-      die: [0, 30],
-      hitReceived: [0, 30],
-      attack: [0, 30]
+      idle: [151, 172],
+      idle2: [177, 230],
+      walk: [263, 288],
+      run: [231, 248],
+      moveLeft: [263, 288], // missing
+      moveRight: [263, 288], // missing
+      die: [67, 112],
+      hitReceived: [121, 144],
+      attack: [1, 51]
     },
     transform: {
-      scale: [0.1, 0.1, 0.1],
-      position: [0, -5.2, 0],
-      rotate: [0, 0, 0]
+      scale: [0.5, 0.5, 0.5],
+      position: [0, -0.2, 0],
+      rotate: [0, 180, 0]
     }
   }
 ];

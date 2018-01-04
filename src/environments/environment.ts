@@ -5,6 +5,6 @@
 
 export const environment = {
   production: false,
-  graphicsOptions: 'verylow',
+  graphicsOptions: 'low',
   openGameAutomatically: false
 };

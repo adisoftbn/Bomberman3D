@@ -23,15 +23,37 @@ class BombermanGameMemoryStorage {
 
 
   private _menuBomb: BombermanPlayerBomb = null;
+  private _gameMode = null;
+
+  public keyPressCallback(event) {
+    if (this._gameBuilder) {
+      this._gameBuilder.keyPressCallback(event);
+    }
+  }
+
+  public keyUpCallback(event) {
+    if (this._gameBuilder) {
+      this._gameBuilder.keyUpCallback(event);
+    }
+  }
+
+  public keyDownCallback(event) {
+    if (this._gameBuilder) {
+      this._gameBuilder.keyDownCallback(event);
+    }
+  }
+
 
   initGameBuilder() {
-    this._gameBuilder = new GameBuilder(gameMemoryStorage.gameRenderer, gameMemoryStorage.graphicsOptions,
-      (eventType: EGameBuilderEventType, data: any) => {
-        if (eventType === EGameBuilderEventType.currentPlayerKilled) {
-          alert('You died!');
+    if (!this._gameBuilder) {
+      this._gameBuilder = new GameBuilder(gameMemoryStorage.gameRenderer, gameMemoryStorage.graphicsOptions,
+        (eventType: EGameBuilderEventType, data: any) => {
+          if (eventType === EGameBuilderEventType.currentPlayerKilled) {
+
+          }
         }
-      }
-    );
+      );
+    }
     this._gameBuilder.setGameTheme(this.gameThemes.getThemeByName('theme1'));
   }
 
@@ -42,14 +64,16 @@ class BombermanGameMemoryStorage {
       this._menuBomb.getModel().scaling.set(5, 5, 5);
       // this.gameRenderer.getCamera().setTarget(this._menuBomb.getModel().position);
     }
-
   }
-
-  buildNewGame() {
+  destroyMenuBackground() {
     if (this._menuBomb) {
-      this._menuBomb.destroy()
+      this._menuBomb.destroy();
       this._menuBomb = null;
     }
+  }
+
+  buildDemoGame() {
+    this.destroyMenuBackground();
     this._gameRules = new BombermanGameRules()
 
     this._gameBuilder.buildBombermanGame(
@@ -58,7 +82,7 @@ class BombermanGameMemoryStorage {
           name: 'Unknown player',
           playerType: EPlayerCharacterType.current,
           characterName: 'Unknown',
-          characterModel: 'female-mage'
+          characterModel: 'rabbit'
         },
         {
           name: 'Unknown player',
@@ -87,7 +111,55 @@ class BombermanGameMemoryStorage {
       this._gameRules
     );
     // this._gameRenderer.getScene().debugLayer.show();
+  }
 
+  buildNewGame(mapSize, players = [], themeName) {
+    this.destroyMenuBackground();
+    const newWidth = 6 + mapSize * Math.round(Math.random() * 4);
+    const newHeight = 6 + mapSize * Math.round(Math.random() * 4);
+    this._gameRules = new BombermanGameRules()
+    this._gameBuilder.buildBombermanGame(
+      players,
+      this.gameThemes.getThemeByName(themeName),
+      {
+        width: newWidth,
+        height: newHeight
+      },
+      this._gameRules
+    );
+    // this._gameRenderer.getScene().debugLayer.show();
+  }
+
+  enterMenuMode() {
+    if (this._gameMode || this._gameMode === null) {
+      console.log('entering Menu mode');
+      this._gameMode = false;
+      if (this._gameBuilder) {
+        this._gameBuilder.cleanUpScene();
+      } else {
+        this.initGameBuilder();
+      }
+      this.createMenuBackground();
+      this.gameRenderer.enterGameMode();
+    }
+  }
+
+  enterGameMode() {
+    if (!this._gameMode || this._gameMode === null) {
+      console.log('entering Game mode');
+      this._gameMode = true;
+      if (this._gameBuilder) {
+        this._gameBuilder.cleanUpScene();
+      } else {
+        this.initGameBuilder();
+      }
+      this.destroyMenuBackground();
+      this.gameRenderer.enterGameMode();
+    }
+  }
+
+  isGameMode() {
+    return this._gameMode;
   }
 }
 

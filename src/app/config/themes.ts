@@ -3,7 +3,8 @@ import { DefaultAlgs } from '../shared/game/defaultAlgorithms';
 export const themesData = [
   {
     name: 'theme1',
-    title: 'Green land',
+    title: 'Greenland',
+    enabled: true,
     description: 'Unknown description',
     groundTextures: [
       'ground-grass'

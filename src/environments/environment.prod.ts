@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  graphicsOptions: 'low',
+  graphicsOptions: 'medium',
   openGameAutomatically: false
 };

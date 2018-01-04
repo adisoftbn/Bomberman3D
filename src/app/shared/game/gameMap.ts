@@ -181,24 +181,36 @@ export class BombermanGameMap {
     for (let i = 1; i <= flareWidth; i++) {
       result.x1++;
       if (x + i >= this._width || !this.canFireCell(x + i, y)) {
+        if (x + i === 1 || x + i === this._width) {
+          result.x1++;
+        }
         break;
       }
     }
     for (let i = 1; i <= flareWidth; i++) {
       result.x2++;
       if (x - i <= 1 || !this.canFireCell(x - i, y)) {
+        if (x - i === 1 || x - i === this._width) {
+          result.x2++;
+        }
         break;
       }
     }
     for (let j = 1; j <= flareWidth; j++) {
       result.y1++;
       if (y + j >= this._height || !this.canFireCell(x, y + j)) {
+        if (y + j === 1 || y + j === this._height) {
+          result.y1++;
+        }
         break;
       }
     }
     for (let j = 1; j <= flareWidth; j++) {
       result.y2++;
       if (y - j <= 1 || !this.canFireCell(x, y - j)) {
+        if (y - j === 1 || y - j === this._height) {
+          result.y2++;
+        }
         break;
       }
     }

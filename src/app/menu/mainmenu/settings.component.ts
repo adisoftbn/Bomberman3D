@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
+import { gameMemoryStorage } from '../../shared/gameMemoryStorage';
+
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
@@ -17,6 +19,7 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit() {
+    gameMemoryStorage.enterMenuMode();
     this.route
       .params
       .subscribe(params => {

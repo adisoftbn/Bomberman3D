@@ -1,7 +1,9 @@
 import { Component, AfterViewInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 
 import { gameMemoryStorage } from '../shared/gameMemoryStorage';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-game',
@@ -9,12 +11,18 @@ import { gameMemoryStorage } from '../shared/gameMemoryStorage';
   styleUrls: ['./game.component.css']
 })
 export class GameComponent implements AfterViewInit {
-  constructor() {
+  constructor(private router: Router) {
   }
 
   ngAfterViewInit() {
-    gameMemoryStorage.buildNewGame();
-    console.log('lalal');
+    if (!gameMemoryStorage.isGameMode()) {
+      if (environment.openGameAutomatically) {
+        gameMemoryStorage.enterGameMode();
+        gameMemoryStorage.buildDemoGame();
+      } else {
+        this.router.navigateByUrl('/');
+      }
+    }
   }
 
 }

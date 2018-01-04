@@ -56,39 +56,40 @@
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="mapSizeDropdown" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">
-              {{currentTheme.label}}
+              {{currentTheme.title}}
             </button>
             <div class="dropdown-menu" aria-labelledby="mapSizeDropdown">
-              <a *ngFor="let theme of themes" class="dropdown-item" href="javascript:void(0)" (click)="switchToTheme(theme)">{{theme.label}}</a>
+              <a *ngFor="let theme of themes" class="dropdown-item" href="javascript:void(0)" (click)="switchToTheme(theme)">{{theme.title}}</a>
             </div>
           </div>
         </div>
       </div>
       <div class="menu-h2">Players</div>
-      <div class="map-players">
+      <div *ngIf="players!=null" class="map-players">
         <div *ngFor="let playerIndex of playersCount" class="player-item">
           <div class="row">
             <div class="col">
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="mapSizeDropdown" data-toggle="dropdown" aria-haspopup="true"
                   aria-expanded="false">
-                  {{players[playerIndex]?players[playerIndex].playerTypeLabel:'None'}}
+                  {{players[playerIndex]?players[playerIndex].playerTypeTitle:'None'}}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="mapSizeDropdown">
-                  <a *ngFor="let playerType of playerTypes" class="dropdown-item" href="javascript:void(0)" (click)="switchPlayerType(playerIndex,playerType)">{{playerType.label}}</a>
+                  <a *ngFor="let playerType of playerTypes" class="dropdown-item" href="javascript:void(0)" (click)="switchPlayerType(playerIndex,playerType)">{{playerType.title}}</a>
                 </div>
               </div>
             </div>
             <div class="col">
-              <div class="dropdown">
+              <div *ngIf="players[playerIndex] && players[playerIndex].playerType" class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="mapSizeDropdown" data-toggle="dropdown" aria-haspopup="true"
                   aria-expanded="false">
-                  {{players[playerIndex]?players[playerIndex].characterLabel:'None'}}
+                  {{players[playerIndex].characterTitle}}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="mapSizeDropdown">
-                  <a *ngFor="let character of characters" class="dropdown-item" href="javascript:void(0)" (click)="switchPlayerCharacter(playerIndex,character)">{{character.label}}</a>
+                  <a *ngFor="let character of characters" class="dropdown-item" href="javascript:void(0)" (click)="switchPlayerCharacter(playerIndex,character)">{{character.title}}</a>
                 </div>
               </div>
+              <div *ngIf="!players[playerIndex] || !players[playerIndex].playerType"  class="disabled-menu-dropdown-button">-</div>
             </div>
           </div>
         </div>
@@ -102,7 +103,7 @@
             <div class="menu-button cancel" [routerLink]="['/new-game']">Back</div>
           </div>
           <div class="col">
-            <div class="menu-button" [routerLink]="['/game']">Start</div>
+            <div class="menu-button" (click)="startSinglePlayerGame()">Start</div>
           </div>
         </div>
       </div>

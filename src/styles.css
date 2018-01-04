@@ -63,6 +63,17 @@ body {
   padding: 10px 0;
 }
 
+.disabled-menu-dropdown-button {
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 15px;
+  font-size: 12px;
+  cursor: pointer;
+  background-color: #17a2b8;
+  color: white;
+  padding: 8px 12px;
+}
+
 .menu-wrapper .dropdown button {
   width: 100%;
   border-radius: 0;
@@ -70,6 +81,7 @@ body {
   border: none;
   box-shadow: none;
   cursor: pointer;
+  font-size: 12px;
 }
 
 .menu-wrapper .dropdown-menu {

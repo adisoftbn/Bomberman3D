@@ -57,6 +57,24 @@ export class GameBuilder {
     this._gameMap = new BombermanGameMap();
   }
 
+  public keyPressCallback(event) {
+    if (this._currentPlayer) {
+      this._currentPlayer.getCharacter().keyPressListener(event);
+    }
+  }
+
+  public keyUpCallback(event) {
+    if (this._currentPlayer) {
+      this._currentPlayer.getCharacter().keyUpListener(event);
+    }
+  }
+
+  public keyDownCallback(event) {
+    if (this._currentPlayer) {
+      this._currentPlayer.getCharacter().keyDownListener(event);
+    }
+  }
+
   protected proceedGameBuilderCallback(eventType: EGameBuilderEventType, data: any = null) {
     if (this._gameBuilderEventCallback) {
       this._gameBuilderEventCallback(eventType, data);
@@ -114,10 +132,44 @@ export class GameBuilder {
   public findNewReward() {
 
   }
-  setGameTheme(gameTheme: BombermanGameTheme) {
+  public setGameTheme(gameTheme: BombermanGameTheme) {
     this._gameTheme = gameTheme;
   }
 
+  public cleanUpScene() {
+    console.log('cleanup scene');
+    if (this._ground) {
+      this._ground.destroy();
+      this._ground = null;
+    }
+    this._borderWall.forEach(cube => {
+      cube.destroy();
+    });
+    this._borderWall = [];
+
+    this._indestructibleWalls.forEach(cube => {
+      cube.destroy();
+    });
+    this._indestructibleWalls = [];
+
+    this._destructibleWalls.forEach(cube => {
+      cube.destroy();
+    });
+    this._destructibleWalls = [];
+
+    this._players.forEach(player => {
+      player.destroy();
+    });
+    this._players = [];
+    if (this._currentPlayer) {
+      this._gameRenderer.getCamera().parent = null;
+      this._gameRenderer.getCamera().position.set(0, 0, 0);
+      this._gameRenderer.getCamera().rotation.set(0, 0, 0); // = BABYLON.Vector3.Zero()
+      this._currentPlayer.destroy();
+      this._currentPlayer = null;
+    }
+    this._gameRenderer.getShadowGenerator().getShadowMap().renderList = [];
+  }
 
   public buildBombermanGame(players: IBombermanPlayerModel[], gameTheme: BombermanGameTheme, size: IBombermanGameSize,
     gameRules: IBombermanGameRules
@@ -238,26 +290,26 @@ export class GameBuilder {
   public flareDestroy(x: number, y: number, directions) {
     const cells = this._gameMap.getFlareAffectedCells(x, y, directions);
     const playerPositions = [];
-    if (!this._currentPlayer.character.isCharacterKilled()) {
-      const rawPosition = this._currentPlayer.character.getPosition();
+    if (!this._currentPlayer.getCharacter().isCharacterKilled()) {
+      const rawPosition = this._currentPlayer.getCharacter().getPosition();
       const newPosition = this._gameMap.fixPosition(rawPosition.x, rawPosition.z);
       if (cells.emptyByHash['cell_' + newPosition.cellX + '_' + newPosition.cellY]) {
-        if (!this._currentPlayer.character.isCharacterKilled()) {
+        if (!this._currentPlayer.getCharacter().isCharacterKilled()) {
           this.proceedGameBuilderCallback(EGameBuilderEventType.currentPlayerKilled);
-          this._currentPlayer.character.killCharacter(() => {
-            // TODO: Event when player killed
+          this._currentPlayer.getCharacter().killCharacter(() => {
+            // TODO: Event when current player killed
           });
         }
       }
     }
     this._players.forEach(player => {
-      if (!player.character.isCharacterKilled()) {
-        const rawPosition = player.character.getPosition();
+      if (!player.getCharacter().isCharacterKilled()) {
+        const rawPosition = player.getCharacter().getPosition();
         const newPosition = this._gameMap.fixPosition(rawPosition.x, rawPosition.z);
         if (cells.emptyByHash['cell_' + newPosition.cellX + '_' + newPosition.cellY]) {
-          if (!player.character.isCharacterKilled()) {
+          if (!player.getCharacter().isCharacterKilled()) {
             this.proceedGameBuilderCallback(EGameBuilderEventType.playerKilled);
-            player.character.killCharacter(() => {
+            player.getCharacter().killCharacter(() => {
               // TODO: Event when player killed
             });
           }
@@ -288,19 +340,6 @@ export class GameBuilder {
           (cell.contents.object as BombermanPlayerBomb).forceKill();
         }*/
       }
-      /*      playerPositions.forEach(player => {
-              console.log(cell.x + ' ' + player.position[0] + ' ' + cell.y + ' ' + player.position[1] + ' ' + player.type);
-              if (cell.x === player.position[0] && cell.y === player.position[1]) {
-                if (!player.character.killed) {
-                  if (player.type === 'current') {
-                    this.proceedGameBuilderCallback(EGameBuilderEventType.currentPlayerKilled);
-                  }
-                  player.character.killCharacter(() => {
-                    // TODO: Event when player killed
-                  });
-                }
-              }
-            });*/
     });
   }
 
