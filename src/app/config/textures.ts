@@ -131,4 +131,10 @@ export const texturesUrl = [
     mq: 'rewards/speed-increase-hq.jpg',
     lq: 'rewards/speed-increase-hq.jpg'
   },
+  {
+    name: 'rewards-bombs-increase',
+    hq: 'rewards/bombs-increase-hq.jpg',
+    mq: 'rewards/bombs-increase-hq.jpg',
+    lq: 'rewards/bombs-increase-hq.jpg'
+  },
 ];

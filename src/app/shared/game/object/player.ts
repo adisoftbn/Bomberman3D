@@ -10,11 +10,12 @@ import { BombermanPlayerStats, EPlayerCharacterType, IBombermanPlayerModel } fro
 export class BombermanPlayer implements IBombermanPlayer {
   private _gameBuilder: GameBuilder;
   _character: Character;
-  stats: BombermanPlayerStats;
+  public stats: BombermanPlayerStats;
 
-  constructor(gameBuilder: GameBuilder, character: IBombermanPlayerModel, initialPosition: number[], currentPlayer: boolean) {
+  constructor(gameBuilder: GameBuilder, character: IBombermanPlayerModel, stats: BombermanPlayerStats, initialPosition: number[],
+    currentPlayer: boolean) {
     this._gameBuilder = gameBuilder;
-    this.stats = new BombermanPlayerStats();
+    this.stats = stats;
     if (currentPlayer) {
       this._character = new Character(
         this._gameBuilder.getGameRenderer(),
@@ -27,6 +28,14 @@ export class BombermanPlayer implements IBombermanPlayer {
           alternateEvents: [
             {
               key: 32,
+              onlyOnPress: true,
+              callback: () => {
+                const position = this._character.getPosition();
+                this.dropBomb(position);
+              }
+            },
+            {
+              key: 'internal_space',
               onlyOnPress: true,
               callback: () => {
                 const position = this._character.getPosition();
@@ -72,12 +81,20 @@ export class BombermanPlayer implements IBombermanPlayer {
   }
 
   dropBomb(position) {
+    if (this.stats.currentBombsCount >= this.stats.maxBombs) {
+      return false;
+    }
+    this.stats.currentBombsCount++;
     const fixedPosition = this._gameBuilder.getGameMap().fixPosition(position.x, position.z);
     if (this._gameBuilder.getGameMap().addBomb(fixedPosition.cellX, fixedPosition.cellY)) {
       const bomb = new BombermanPlayerBomb(this._gameBuilder, this.stats, new Vector3(fixedPosition.x, 0.15, fixedPosition.y),
         (bombPower: number) => {
           const directions = this._gameBuilder.getGameMap().getFlareDirections(fixedPosition.cellX, fixedPosition.cellY, bombPower);
-          this._gameBuilder.flareDestroy(fixedPosition.cellX, fixedPosition.cellY, directions);
+          const cells = this._gameBuilder.flareDestroy(fixedPosition.cellX, fixedPosition.cellY, directions);
+          setTimeout(() => {
+            this._gameBuilder.flareDestroyPlayers(fixedPosition.cellX, fixedPosition.cellY, directions, cells);
+            this.stats.currentBombsCount--;
+          }, this.stats.bombFlareTimeout);
           // TODO: destroy walls
           return directions;
         },
@@ -91,6 +108,7 @@ export class BombermanPlayer implements IBombermanPlayer {
     } else {
       // TODO: if cell not empty?
     }
+    return true;
   }
 
   destroy() {

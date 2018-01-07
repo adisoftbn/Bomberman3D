@@ -2,22 +2,29 @@ import { Vector3 } from 'babylonjs';
 
 import { GameRenderer } from '../engine';
 import { BaseModel, Cube, Ground } from '../engine/object';
+import { JoystickEvent } from '../engine/model';
+
 
 import { BombermanGameMap } from './gameMap';
+import { BombermanGameRewards } from './gameRewards';
 
 import {
   EPlayerCharacterType, BombermanPlayerStats, IBombermanPlayerModel, BombermanGameTheme, IBombermanGameSize,
-  EBombermanWallType, IBombermanGameRules, BombermanGameRules
+  EBombermanWallType, IBombermanGameRules, BombermanGameRules, IBombermanGameReward
 } from './model';
 
 import { IBombermanGraphicsOptions } from './model/options';
-import { BombermanPlayer, DestructibleWall, IndestructibleWall, BombermanPlayerBomb } from './object';
+import { BombermanPlayer, DestructibleWall, IndestructibleWall, BombermanReward, BombermanPlayerBomb } from './object';
 
 export enum EGameBuilderEventType {
   currentPlayerKilled = 1,
   playerKilled = 2,
-  reward = 3
+  reward = 3,
+  gameStart = 4,
+  gameEnd = 5,
+  gameRewardFound = 6
 }
+
 export type TGameBuilderCallback = (eventType: EGameBuilderEventType, data?: any) => void;
 
 
@@ -30,12 +37,13 @@ export class GameBuilder {
   private _destructibleWalls: DestructibleWall[] = [];
 
 
-  private _curretPlayerStats: BombermanPlayerStats;
+  private _currentPlayerStats: BombermanPlayerStats;
   private _currentPlayer: BombermanPlayer;
   private _players: BombermanPlayer[] = [];
 
   private _gameMap: BombermanGameMap;
   private _gameTheme: BombermanGameTheme;
+  private _gameRewards: BombermanGameRewards;
   private _gameRules: IBombermanGameRules;
 
 
@@ -49,12 +57,19 @@ export class GameBuilder {
   protected _gameBuilderEventCallback: TGameBuilderCallback = null;
 
 
-  constructor(gameRenderer: GameRenderer, gameGraphicsOptions: IBombermanGraphicsOptions,
+  constructor(gameRenderer: GameRenderer, gameRewards: BombermanGameRewards, gameGraphicsOptions: IBombermanGraphicsOptions,
     gameBuilderEventCallback: TGameBuilderCallback = null) {
     this._gameRenderer = gameRenderer;
+    this._gameRewards = gameRewards;
     this._gameGraphicsOptions = gameGraphicsOptions;
     this._gameBuilderEventCallback = gameBuilderEventCallback;
     this._gameMap = new BombermanGameMap();
+  }
+
+  public joystickEventCallback(event: JoystickEvent) {
+    if (this._currentPlayer) {
+      this._currentPlayer.getCharacter().joystickEventListener(event);
+    }
   }
 
   public keyPressCallback(event) {
@@ -129,9 +144,6 @@ export class GameBuilder {
     return EBombermanWallType.cube;
   }
 
-  public findNewReward() {
-
-  }
   public setGameTheme(gameTheme: BombermanGameTheme) {
     this._gameTheme = gameTheme;
   }
@@ -167,6 +179,7 @@ export class GameBuilder {
       this._gameRenderer.getCamera().rotation.set(0, 0, 0); // = BABYLON.Vector3.Zero()
       this._currentPlayer.destroy();
       this._currentPlayer = null;
+      this._currentPlayerStats = null;
     }
     this._gameRenderer.getShadowGenerator().getShadowMap().renderList = [];
   }
@@ -196,9 +209,11 @@ export class GameBuilder {
     this.buildPlayers(players);
     this.generateDestructibleWalls();
     this._gameMap.makeMapReady();
+    this.proceedGameBuilderCallback(EGameBuilderEventType.gameStart);
   }
 
   private buildBorder() {
+    const borderWidth = 0.3;
     const borderTexture = this.findIndestructibleTexture();
     const borderGraphicsOptions = {
       shadowEnabled: this._gameGraphicsOptions.borderWallShadowEnabled,
@@ -206,29 +221,29 @@ export class GameBuilder {
     };
     let cube = new Cube(
       this._gameRenderer,
-      new Vector3(this._gameMap.getWidth() / 2, this._wallHeight / 2, -0.5),
-      this._gameMap.getWidth() + 2, this._wallHeight, 1, false, borderGraphicsOptions
+      new Vector3(this._gameMap.getWidth() / 2, this._wallHeight / 2, -borderWidth / 2),
+      this._gameMap.getWidth() + borderWidth * 2, this._wallHeight, borderWidth, false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
-      new Vector3(this._gameMap.getWidth() / 2, this._wallHeight / 2, this._gameMap.getHeight() + 0.5),
-      this._gameMap.getWidth() + 2, this._wallHeight, 1, false, borderGraphicsOptions
+      new Vector3(this._gameMap.getWidth() / 2, this._wallHeight / 2, this._gameMap.getHeight() + borderWidth / 2),
+      this._gameMap.getWidth() + borderWidth * 2, this._wallHeight, borderWidth, false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
-      new Vector3(-0.5, this._wallHeight / 2, this._gameMap.getHeight() / 2),
-      1, this._wallHeight, this._gameMap.getHeight(), false, borderGraphicsOptions
+      new Vector3(-borderWidth / 2, this._wallHeight / 2, this._gameMap.getHeight() / 2),
+      borderWidth, this._wallHeight, this._gameMap.getHeight(), false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
     cube = new Cube(
       this._gameRenderer,
-      new Vector3(this._gameMap.getWidth() + 0.5, this._wallHeight / 2, this._gameMap.getHeight() / 2),
-      1, this._wallHeight, this._gameMap.getHeight(), false, borderGraphicsOptions
+      new Vector3(this._gameMap.getWidth() + borderWidth / 2, this._wallHeight / 2, this._gameMap.getHeight() / 2),
+      borderWidth, this._wallHeight, this._gameMap.getHeight(), false, borderGraphicsOptions
     );
     cube.setTextureFromGallery(borderTexture);
     this._borderWall.push(cube);
@@ -260,9 +275,9 @@ export class GameBuilder {
       );
       const randNr = Math.round(Math.random() * this._rewardMaxPosibilites);
       cube.setTextureFromGallery(cubeTexture);
-      let reward = null;
+      let reward = true;
       if (randNr === this._rewardChance) {
-        reward = this.findNewReward();
+        reward = true;
       }
       this._gameMap.addDestructibleWall(position[0], position[1], cube, reward);
       this._destructibleWalls.push(cube);
@@ -277,19 +292,19 @@ export class GameBuilder {
       index++;
       const currentPosition = this._gameMap.findBetterPlayerPosition(positions[index - 1]);
       if (character.playerType === EPlayerCharacterType.current) {
+        this._currentPlayerStats = new BombermanPlayerStats();
         this._gameMap.addPlayerPosition(currentPosition[0], currentPosition[1]);
-        this._currentPlayer = new BombermanPlayer(this, character, currentPosition, true)
+        this._currentPlayer = new BombermanPlayer(this, character, this._currentPlayerStats, currentPosition, true)
       } else {
-        const newPlayer = new BombermanPlayer(this, character, currentPosition, false)
+        const newPlayer = new BombermanPlayer(this, character, new BombermanPlayerStats(), currentPosition, false)
         this._gameMap.addPlayerPosition(currentPosition[0], currentPosition[1]);
         this._players.push(newPlayer);
       }
     });
   }
 
-  public flareDestroy(x: number, y: number, directions) {
-    const cells = this._gameMap.getFlareAffectedCells(x, y, directions);
-    const playerPositions = [];
+  public flareDestroyPlayers(x: number, y: number, directions, computedCells = null) {
+    const cells = (computedCells ? computedCells : this._gameMap.getFlareAffectedCells(x, y, directions));
     if (!this._currentPlayer.getCharacter().isCharacterKilled()) {
       const rawPosition = this._currentPlayer.getCharacter().getPosition();
       const newPosition = this._gameMap.fixPosition(rawPosition.x, rawPosition.z);
@@ -316,8 +331,18 @@ export class GameBuilder {
         }
       }
     });
+    return cells;
+  }
+  public addNewReward(x: number, y: number, gameReward: IBombermanGameReward) {
+    const cube = new BombermanReward(
+      this,
+      new Vector3(x - 0.5, 0.15, y - 0.5),
+      gameReward
+    );
+  }
 
-
+  public flareDestroy(x: number, y: number, directions, computedCells = null) {
+    const cells = this.flareDestroyPlayers(x, y, directions, computedCells);
     cells.walls.forEach(cell => {
       if (cell.contents.type === 'destructible-wall') {
         if (this._gameMap.removeDestructibleWall(cell.x, cell.y)) {
@@ -327,6 +352,11 @@ export class GameBuilder {
             (cell.contents.object as DestructibleWall).killWall(() => {
               cell.contents.object.destroy();
             });
+          }
+          if (cell.contents.reward) {
+            this.addNewReward(cell.x, cell.y, this._gameRewards.getRandomReward());
+          } else {
+            // TODO: random increase rewards
           }
         } else {
           // TODO: maybe a bug hapens sometimes. But it doesn't!
@@ -341,6 +371,7 @@ export class GameBuilder {
         }*/
       }
     });
+    return cells;
   }
 
   public getGameGraphicsOptions(): IBombermanGraphicsOptions {
@@ -358,4 +389,13 @@ export class GameBuilder {
   public getGameMap(): BombermanGameMap {
     return this._gameMap;
   }
+
+  public getCurrentPlayer() {
+    return this._currentPlayer;
+  }
+
+  public getCurrentPlayerStats() {
+    return this._currentPlayerStats;
+  }
+
 }

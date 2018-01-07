@@ -6,5 +6,6 @@
 export const environment = {
   production: false,
   graphicsOptions: 'low',
-  openGameAutomatically: false
+  openGameAutomatically: true,
+  forceMobileControl: true
 };

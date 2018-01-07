@@ -2,7 +2,72 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   touch-action: none;
+}
+
+#zone_joystick {
+  position: absolute;
+  right: calc(100vw / 10);
+  bottom: calc((100vh / 10) * 3 - 35px);
+  width: 70px;
+  height: 70px;
+}
+
+#zone_joystick_bomb {
+  position: absolute;
+  left: calc(100vw / 10);
+  bottom: calc((100vh / 10) * 3 - 35px);
+  width: 70px;
+  height: 70px;
+  border-radius: 100%;
+  background: #30C5FF;
+  opacity: 0.5;
+}
+
+#zone_joystick_bomb.unavailable {
+  background: #653239;
+}
+
+.game-details {
+  position: absolute;
+  right: 20px;
+  top: 44px;
+  display: block;
+  z-index: 10001;
+  color: white;
+  font-size: 12px;
+  line-height: 20px;
+  background-color: #7283a0;
+  border-radius: 3px;
+}
+
+.game-details .row {
+  margin: 0;
+}
+
+.game-details .col,
+.game-details .col-auto {
+  padding: 5px;
+}
+
+.game-details-icon {
+  width: 16px;
+  height: 16px;
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.game-details-icon.bomb {
+  background-image: url('/assets/images/ui/icon-bomb.png');
+}
+
+.game-details-icon.speed {
+  background-image: url('/assets/images/ui/icon-speed.png');
+}
+
+.game-details-icon.power {
+  background-image: url('/assets/images/ui/icon-fire.png');
 }

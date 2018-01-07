@@ -3,3 +3,4 @@ export * from './player.interface';
 export * from './player';
 export * from './destructibleWall';
 export * from './indestructibleWall';
+export * from './reward';

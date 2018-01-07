@@ -44,18 +44,32 @@ export class BombermanGameMap {
     };
   }
 
-  public addDestructibleWall(x: number, y: number, object, reward) {
+  public addDestructibleWall(x: number, y: number, object, hasReward) {
     this._map[x][y] = {
       type: 'destructible-wall',
       object,
-      reward
+      reward: hasReward
     };
   }
 
   public removeDestructibleWall(x: number, y: number) {
     if (this._map[x][y] && this._map[x][y].type === 'destructible-wall') {
       this._map[x][y] = null;
-      this.bombsCache--;
+      return true;
+    }
+    return false;
+  }
+
+  public addReward(x: number, y: number, object) {
+    this._map[x][y] = {
+      type: 'reward',
+      object
+    };
+  }
+
+  public removeReward(x: number, y: number) {
+    if (this._map[x][y] && this._map[x][y].type === 'reward') {
+      this._map[x][y] = null;
       return true;
     }
     return false;

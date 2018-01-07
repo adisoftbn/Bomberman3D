@@ -15,7 +15,7 @@ export class GameComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (!gameMemoryStorage.isGameMode()) {
+    if (!(gameMemoryStorage as any)._gameMode) {
       if (environment.openGameAutomatically) {
         gameMemoryStorage.enterGameMode();
         gameMemoryStorage.buildDemoGame();

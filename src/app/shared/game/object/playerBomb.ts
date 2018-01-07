@@ -90,21 +90,27 @@ export class BombermanPlayerBomb {
           explosionStage = EPlayerBombStage.explosionStarting;
         }
         if (explosionStage === EPlayerBombStage.initialTimeElapse) {
+
           if (!exploded) {
             const elapsedTime = performance.now() - startTime;
             const scaleValue = (Math.sin((elapsedTime / cachedBombTimeout) * 10 * Math.PI) + 1) / 4 + 0.9;
             mesh.scaling.set(scaleValue, scaleValue, scaleValue);
           }
+
         } else if (explosionStage === EPlayerBombStage.explosionStarting) {
+
           explosionStage = EPlayerBombStage.explosionFlaresEnding;
           sphereModel.scaling.set(1, 1, 1);
           particles.stop();
           const result = scanMapCallback(cachedBombPower);
           flares = this.createFireFlares(sphereModel, result.x1, result.x2, result.y1, result.y2);
+
           setTimeout(() => {
             explosionStage = EPlayerBombStage.explosionFlaresClear;
-          }, 300);
+          }, playerStats.bombFlareTimeout);
+
         } else if (explosionStage === EPlayerBombStage.explosionFlaresClear) {
+
           explosionStage = EPlayerBombStage.explosionEnding;
           (flares as any).maxX1Particles.stop();
           (flares as any).maxX2Particles.stop();
@@ -113,10 +119,13 @@ export class BombermanPlayerBomb {
           sphereModel.material.alpha = 0;
           torusModel.material.alpha = 0;
           particles.destroy();
+
           setTimeout(() => {
             explosionStage = EPlayerBombStage.explosionDone;
-          }, 300);
+          }, playerStats.bombFlareCleanUpTimeout);
+
         } else if (explosionStage === EPlayerBombStage.explosionDone) {
+
           explosionStage = EPlayerBombStage.cleanUp;
           (flares as any).maxX1Particles.destroy();
           (flares as any).maxX2Particles.destroy();
@@ -124,6 +133,7 @@ export class BombermanPlayerBomb {
           (flares as any).maxY2Particles.destroy();
           torus.destroy();
           doneCallback();
+
         }
       });
 

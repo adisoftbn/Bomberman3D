@@ -9,3 +9,6 @@ export * from './wallType.enum';
 
 export * from './gameRules.interface';
 export * from './gameRules';
+
+export * from './gameReward.interface';
+export * from './gameReward';
