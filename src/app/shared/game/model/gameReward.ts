@@ -1,11 +1,11 @@
 import { IBombermanGameRewardStats, IBombermanGameReward } from './gameReward.interface';
 
 export class BombermanGameRewardStats implements IBombermanGameRewardStats {
-  maxMovingSpeed = 0;
-  bombTimeout = 0;
-  bombPower = 0;
-  maxBombs = 0;
-  rewardsIncrease = 0;
+  maxMovingSpeed = null;
+  bombTimeout = null;
+  bombPower = null;
+  maxBombs = null;
+  rewardsIncrease = null;
 }
 
 export class BombermanGameReward implements IBombermanGameReward {

@@ -4,7 +4,7 @@ import { IBombermanPlayer } from './player.interface';
 import { BombermanPlayerBomb } from './playerBomb';
 import { GameBuilder } from '../';
 
-import { Character } from '../../engine/object';
+import { Character, TCharacterCallback } from '../../engine/object';
 import { BombermanPlayerStats, EPlayerCharacterType, IBombermanPlayerModel } from '../model';
 
 export class BombermanPlayer implements IBombermanPlayer {
@@ -13,7 +13,7 @@ export class BombermanPlayer implements IBombermanPlayer {
   public stats: BombermanPlayerStats;
 
   constructor(gameBuilder: GameBuilder, character: IBombermanPlayerModel, stats: BombermanPlayerStats, initialPosition: number[],
-    currentPlayer: boolean) {
+    currentPlayer: boolean, playerEvent: TCharacterCallback = null) {
     this._gameBuilder = gameBuilder;
     this.stats = stats;
     if (currentPlayer) {
@@ -48,7 +48,8 @@ export class BombermanPlayer implements IBombermanPlayer {
         {
           shadowEnabled: this._gameBuilder.getGameGraphicsOptions().charactersShadowEnabled,
           shadowQuality: this._gameBuilder.getGameGraphicsOptions().charactersShadowQuality
-        }
+        },
+        playerEvent
       );
       this._character.buildFromGallery(character.characterModel, () => {
         const camera = this._gameBuilder.getGameRenderer().getCamera();

@@ -37,6 +37,7 @@ export class BombermanReward extends BaseModel {
     this._modelMaterial.ambientColor = this._gameRenderer.ambientColor;
     this.setTextureFromGallery(gameReward.texture);
   }
+
   private buildModel() {
     if (this._modelBuilt) {
       return;
@@ -69,6 +70,10 @@ export class BombermanReward extends BaseModel {
         this._gameRenderer.getShadowGenerator().addShadowCaster(this._model);
       }
     }
+  }
+
+  public getGameReward(): IBombermanGameReward {
+    return this._gameReward;
   }
 
   public getModel() {

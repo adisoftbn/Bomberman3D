@@ -14,28 +14,30 @@ export class BombermanGameRewards {
       newRewardItem.name = reward.name;
       newRewardItem.enabled = reward.enabled;
       newRewardItem.texture = reward.texture;
-      if (newRewardItem.stats.maxMovingSpeed) {
+      if (typeof newRewardItem.stats.maxMovingSpeed !== 'undefined') {
         newRewardItem.stats.maxMovingSpeed = reward.stats.maxMovingSpeed;
       }
-      if (newRewardItem.stats.bombTimeout) {
+      if (typeof newRewardItem.stats.bombTimeout !== 'undefined') {
         newRewardItem.stats.bombTimeout = reward.stats.bombTimeout;
       }
-      if (newRewardItem.stats.bombPower) {
+      if (typeof newRewardItem.stats.bombPower !== 'undefined') {
         newRewardItem.stats.bombPower = reward.stats.bombPower;
       }
-      if (newRewardItem.stats.maxBombs) {
+      if (typeof newRewardItem.stats.maxBombs !== 'undefined') {
         newRewardItem.stats.maxBombs = reward.stats.maxBombs;
       }
-      if (newRewardItem.stats.rewardsIncrease) {
+      if (typeof newRewardItem.stats.rewardsIncrease !== 'undefined') {
         newRewardItem.stats.rewardsIncrease = reward.stats.rewardsIncrease;
       }
       this._rewards[reward.name] = newRewardItem;
-      if (reward.chances) {
-        for (let i = 1; i <= reward.chances; i++) {
+      if (newRewardItem.enabled) {
+        if (reward.chances) {
+          for (let i = 1; i <= reward.chances; i++) {
+            this._rewardslist.push(newRewardItem);
+          }
+        } else {
           this._rewardslist.push(newRewardItem);
         }
-      } else {
-        this._rewardslist.push(newRewardItem);
       }
     });
   }

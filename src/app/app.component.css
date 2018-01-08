@@ -71,3 +71,7 @@
 .game-details-icon.power {
   background-image: url('/assets/images/ui/icon-fire.png');
 }
+
+.game-details-icon.time {
+  background-image: url('/assets/images/ui/icon-time.png');
+}

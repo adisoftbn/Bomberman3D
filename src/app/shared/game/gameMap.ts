@@ -38,18 +38,50 @@ export class BombermanGameMap {
   }
 
   public addIndestructibleWall(x: number, y: number, object) {
-    this._map[x][y] = {
-      type: 'indestructible-wall',
-      object
-    };
+    if (!this._map[x][y]) {
+      this._map[x][y] = {
+        type: 'indestructible-wall',
+        object
+      };
+      return true;
+    }
+    return false;
+  }
+
+  public setIndestructibleWall(x: number, y: number, object) {
+    if (this._map[x][y] && this._map[x][y].type === 'indestructible-wall') {
+      this._map[x][y].object = object;
+      return true;
+    }
+    return false;
+  }
+
+  public removeIndestructibleWall(x: number, y: number) {
+    if (this._map[x][y] && this._map[x][y].type === 'indestructible-wall') {
+      this._map[x][y] = null;
+      return true;
+    }
+    return false;
   }
 
   public addDestructibleWall(x: number, y: number, object, hasReward) {
-    this._map[x][y] = {
-      type: 'destructible-wall',
-      object,
-      reward: hasReward
-    };
+    if (!this._map[x][y]) {
+      this._map[x][y] = {
+        type: 'destructible-wall',
+        object,
+        reward: hasReward
+      };
+      return true;
+    }
+    return false;
+  }
+
+  public setDestructibleWall(x: number, y: number, object) {
+    if (this._map[x][y] && this._map[x][y].type === 'destructible-wall') {
+      this._map[x][y].object = object;
+      return true;
+    }
+    return false;
   }
 
   public removeDestructibleWall(x: number, y: number) {
@@ -61,10 +93,22 @@ export class BombermanGameMap {
   }
 
   public addReward(x: number, y: number, object) {
-    this._map[x][y] = {
-      type: 'reward',
-      object
-    };
+    if (!this._map[x][y]) {
+      this._map[x][y] = {
+        type: 'reward',
+        object
+      };
+      return true;
+    }
+    return false;
+  }
+
+  public setReward(x: number, y: number, object) {
+    if (this._map[x][y] && this._map[x][y].type === 'reward') {
+      this._map[x][y].object = object;
+      return true;
+    }
+    return false;
   }
 
   public removeReward(x: number, y: number) {
@@ -78,23 +122,27 @@ export class BombermanGameMap {
 
 
   public addPlayerPosition(x: number, y: number) {
-    this._map[x][y] = {
-      type: 'initial-player-position'
-    };
-    const delta = 3;
-    const distance = 2;
-    for (let i = x - 3; i < x + 3; i++) {
-      for (let j = y - 3; j < y + 3; j++) {
-        if (i > 0 && i <= this._width && j > 0 && j <= this._height) {
-          const dist = Math.ceil(Math.sqrt(Math.pow(x - i, 2) + Math.pow(y - j, 2)));
-          if (this._map[i][j] === null && !(x === i && y === j) && dist <= distance && this.emptyBetween(x, y, i, j)) {
-            this._map[i][j] = {
-              type: 'reserved'
-            };
+    if (!this._map[x][y]) {
+      this._map[x][y] = {
+        type: 'initial-player-position'
+      };
+      const delta = 3;
+      const distance = 2;
+      for (let i = x - 3; i < x + 3; i++) {
+        for (let j = y - 3; j < y + 3; j++) {
+          if (i > 0 && i <= this._width && j > 0 && j <= this._height) {
+            const dist = Math.ceil(Math.sqrt(Math.pow(x - i, 2) + Math.pow(y - j, 2)));
+            if (this._map[i][j] === null && !(x === i && y === j) && dist <= distance && this.emptyBetween(x, y, i, j)) {
+              this._map[i][j] = {
+                type: 'reserved'
+              };
+            }
           }
         }
       }
+      return true;
     }
+    return false;
   }
 
   findBetterPlayerPosition(position: number[]): number[] {
@@ -103,6 +151,24 @@ export class BombermanGameMap {
     let foundPosition = position;
     for (let i = position[0] - radius; i < position[0] + radius; i++) {
       for (let j = position[1] - radius; j < position[1] + radius; j++) {
+        if (i >= 1 && i <= this._width && j >= 1 && j <= this._height && !this._map[i][j]) {
+          positions.push([i, j]);
+        }
+      }
+    }
+    if (positions.length > 0) {
+      this.shuffle(positions);
+      foundPosition = positions[Math.floor(Math.random() * positions.length)];
+    }
+    return foundPosition;
+  }
+
+  findFreePosition(x: number, y: number) {
+    const radius = 2;
+    const positions = [];
+    let foundPosition = [x, y];
+    for (let i = x - radius; i < x + radius; i++) {
+      for (let j = y - radius; j < y + radius; j++) {
         if (i >= 1 && i <= this._width && j >= 1 && j <= this._height && !this._map[i][j]) {
           positions.push([i, j]);
         }
