@@ -8,6 +8,7 @@ export interface IBombermanGameRewardStats {
 
 export interface IBombermanGameReward {
   name: string;
+  title: string;
   enabled: boolean;
   texture: string,
   stats: IBombermanGameRewardStats;

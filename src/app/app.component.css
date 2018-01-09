@@ -30,6 +30,12 @@
   background: #653239;
 }
 
+.alertsRoot {
+  position: absolute;
+  left: 20px;
+  top: 44px;
+}
+
 .game-details {
   position: absolute;
   right: 20px;

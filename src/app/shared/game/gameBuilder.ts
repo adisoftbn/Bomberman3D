@@ -308,10 +308,12 @@ export class GameBuilder {
               const cell = this._gameMap.getCell(data.x, data.y);
               if (cell && cell.object) {
                 if (cell.type === 'reward') {
+                  this._gameMap.removeReward(data.x, data.y);
                   (cell.object as BombermanReward).killReward(() => {
-                    this._currentPlayerStats.addGameReward((cell.object as BombermanReward).getGameReward());
-                    cell.object.destroy();
-                    this._gameMap.removeReward(data.x, data.y);
+                    const foundReward = (cell.object as BombermanReward).getGameReward();
+                    this.addScreenAlert(foundReward.title);
+                    this._currentPlayerStats.addGameReward(foundReward);
+                    (cell.object as BombermanReward).destroy();
                   });
                 }
               }
@@ -395,12 +397,15 @@ export class GameBuilder {
         }
       } else if (cell.contents.type === 'bomb') {
         if (this._gameRules.bombCascadeDestroy) {
-          (cell.contents.object as BombermanPlayerBomb).forceKill();
+          if (this._gameMap.removeBomb(cell.x, cell.y)) {
+            (cell.contents.object as BombermanPlayerBomb).forceKill();
+          }
         }
       } else if (cell.contents.type === 'reward') {
-        (cell.contents.object as BombermanReward).killReward(() => {
-          this._gameMap.removeReward(cell.x, cell.y);
-        });
+        if (this._gameMap.removeReward(cell.x, cell.y)) {
+          (cell.contents.object as BombermanReward).killReward(() => {
+          });
+        }
         // } else if (cell.contents.type === 'indestructible-wall') {
         /* if (this._gameRules.bombCascadeDestroy) {
           (cell.contents.object as BombermanPlayerBomb).forceKill();
@@ -434,4 +439,16 @@ export class GameBuilder {
     return this._currentPlayerStats;
   }
 
+  public addScreenAlert(title) {
+    const newAlert = $(`
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      ${title}
+    </div>
+    `);
+    setTimeout(() => {
+      newAlert.remove();
+    }, 3000);
+    $('.alertsRoot').append(newAlert);
+  }
 }

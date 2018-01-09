@@ -100,20 +100,24 @@ export class BombermanReward extends BaseModel {
     const animationLength = 1000;
     const endTime = startTime + animationLength;
     let finished = false;
-    this._model.registerBeforeRender((mesh) => {
-      if (!finished) {
-        if (performance.now() >= endTime) {
-          finished = true;
-          this._model.registerAfterRender(() => {
-            finishCallback();
-          });
-        } else {
-          const scaleValue = (endTime - performance.now()) / animationLength;
-          mesh.scaling.set(scaleValue, scaleValue, scaleValue);
-          mesh.material.alpha = scaleValue;
+    if (this._model) {
+      this._model.registerBeforeRender((mesh) => {
+        if (!finished) {
+          if (performance.now() >= endTime) {
+            finished = true;
+            this._model.registerAfterRender(() => {
+              finishCallback();
+            });
+          } else {
+            const scaleValue = (endTime - performance.now()) / animationLength;
+            mesh.scaling.set(scaleValue, scaleValue, scaleValue);
+            mesh.material.alpha = scaleValue;
+          }
         }
-      }
-    });
+      });
+    } else {
+      finishCallback();
+    }
   }
 
   public destroy() {

@@ -13,6 +13,7 @@ export class BombermanGameRewards {
       const newRewardItem = new BombermanGameReward();
       newRewardItem.name = reward.name;
       newRewardItem.enabled = reward.enabled;
+      newRewardItem.title = reward.title;
       newRewardItem.texture = reward.texture;
       if (typeof newRewardItem.stats.maxMovingSpeed !== 'undefined') {
         newRewardItem.stats.maxMovingSpeed = reward.stats.maxMovingSpeed;

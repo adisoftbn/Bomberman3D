@@ -5,3 +5,4 @@ interface NodeModule {
 }
 
 declare var nipplejs;
+declare var $;

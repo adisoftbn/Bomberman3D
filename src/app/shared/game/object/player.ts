@@ -85,16 +85,16 @@ export class BombermanPlayer implements IBombermanPlayer {
     if (this.stats.currentBombsCount >= this.stats.maxBombs) {
       return false;
     }
-    this.stats.currentBombsCount++;
     const fixedPosition = this._gameBuilder.getGameMap().fixPosition(position.x, position.z);
     if (this._gameBuilder.getGameMap().addBomb(fixedPosition.cellX, fixedPosition.cellY)) {
+      this.stats.currentBombsCount++;
       const bomb = new BombermanPlayerBomb(this._gameBuilder, this.stats, new Vector3(fixedPosition.x, 0.15, fixedPosition.y),
         (bombPower: number) => {
           const directions = this._gameBuilder.getGameMap().getFlareDirections(fixedPosition.cellX, fixedPosition.cellY, bombPower);
           const cells = this._gameBuilder.flareDestroy(fixedPosition.cellX, fixedPosition.cellY, directions);
+          this.stats.currentBombsCount--;
           setTimeout(() => {
             this._gameBuilder.flareDestroyPlayers(fixedPosition.cellX, fixedPosition.cellY, directions, cells);
-            this.stats.currentBombsCount--;
           }, this.stats.bombFlareTimeout);
           // TODO: destroy walls
           return directions;

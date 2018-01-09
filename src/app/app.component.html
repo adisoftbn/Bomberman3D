@@ -1,4 +1,7 @@
 <canvas id="renderCanvas"></canvas>
+<div class="alertsRoot">
+
+</div>
 <div *ngIf="gameMemoryStorage.isGameMode && gameMemoryStorage.currentPlayer && gameMemoryStorage.currentPlayer.stats" class="game-details">
   <div class="row">
     <div class="col-auto">
@@ -8,7 +11,7 @@
     <div class="col-auto">
       <div class="game-details-icon bomb"></div>
     </div>
-    <div class="col">{{gameMemoryStorage.currentPlayer.stats.maxBombs-gameMemoryStorage.currentPlayer.stats.currentBombsCount}}</div>
+    <div class="col">{{gameMemoryStorage.currentPlayer.stats.maxBombs-gameMemoryStorage.currentPlayer.stats.currentBombsCount}}/{{gameMemoryStorage.currentPlayer.stats.maxBombs}}</div>
     <div class="col-auto">
       <div class="game-details-icon power"></div>
     </div>
@@ -16,7 +19,7 @@
     <div class="col-auto">
       <div class="game-details-icon speed"></div>
     </div>
-    <div class="col">{{gameMemoryStorage.currentPlayer.stats.movingSpeed}}</div>
+    <div class="col">{{gameMemoryStorage.currentPlayer.stats.maxMovingSpeed}}</div>
   </div>
 </div>
 <div id="zone_joystick"></div>

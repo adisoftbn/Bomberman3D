@@ -10,6 +10,7 @@ export class BombermanGameRewardStats implements IBombermanGameRewardStats {
 
 export class BombermanGameReward implements IBombermanGameReward {
   name = 'unknown';
+  title = 'Unknown';
   enabled = false;
   texture = 'test';
   stats = new BombermanGameRewardStats();
